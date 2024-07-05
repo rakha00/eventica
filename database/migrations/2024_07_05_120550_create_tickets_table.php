@@ -13,6 +13,13 @@ return new class extends Migration
     {
         Schema::create('tickets', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('transaction_id')->constrained('transactions');
+            $table->string('ticket_id')->unique();
+            $table->string('name');
+            $table->string('email');
+            $table->string('phone');
+            $table->string('identity_card_number');
+            $table->string('status');
             $table->timestamps();
         });
     }

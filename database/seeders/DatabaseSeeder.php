@@ -4,6 +4,8 @@ namespace Database\Seeders;
 
 use App\Models\Event;
 use App\Models\EventCategory;
+use App\Models\EventPackage;
+use App\Models\Post;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -16,11 +18,17 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        Post::factory(10)->create();
         $categories = EventCategory::factory(5)->create();
         Event::factory(10)->make()->each(function ($event) use ($categories) {
             $event->event_category_id = $categories->random()->id;
             $event->save();
+
+            EventPackage::factory(3)->create([
+                'start_valid' => fake()->dateTimeBetween($event->start_event, $event->end_event),
+                'end_valid' => fake()->dateTimeBetween($event->start_event, $event->end_event),
+                'event_id' => $event->id,
+            ]);
         });
 
 

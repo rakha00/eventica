@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('events', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('event_category_id')->constrained('event_categories');
             $table->string('title');
             $table->text('description');
             $table->text('highlight');
@@ -22,7 +23,6 @@ return new class extends Migration
             $table->string('location');
             $table->string('status')->default('unpublished');
             $table->string('slug')->unique();
-            $table->foreignId('event_category_id')->constrained('event_categories');
             $table->timestamps();
         });
     }

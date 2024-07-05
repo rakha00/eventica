@@ -13,6 +13,12 @@ return new class extends Migration
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained('users');
+            $table->foreignId('event_package_id')->constrained('event_packages');
+            $table->string('order_id')->unique();
+            $table->unsignedBigInteger('quantity');
+            $table->unsignedBigInteger('total_price');
+            $table->string('status');
             $table->timestamps();
         });
     }

@@ -9,19 +9,12 @@ use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
 use Filament\Resources\Resource;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\RichEditor;
 use Illuminate\Database\Eloquent\Builder;
-use Filament\Forms\Components\DateTimePicker;
 use App\Filament\Resources\EventResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\EventResource\RelationManagers;
 use App\Models\Event;
-use Filament\Forms\Components\Hidden;
-use Filament\Tables\Columns\ImageColumn;
-use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\Tabs\Tab;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class EventResource extends Resource
@@ -40,40 +33,44 @@ class EventResource extends Resource
 
         return $form
             ->schema([
-                TextInput::make('title')
+                Forms\Components\TextInput::make('title')
                     ->required()
                     ->autocomplete(false)
                     ->maxLength(100)
                     ->live(debounce: 500)
                     ->afterStateUpdated(fn (Set $set, ?string $state) => $set('slug', Str::slug($state))),
-                Select::make('location')
+                Forms\Components\Select::make('location')
                     ->required()
                     ->options($provinceOptions),
-                Select::make('event_category_id')
+                Forms\Components\Select::make('event_category_id')
                     ->relationship('category', 'title')
                     ->required(),
-                FileUpload::make('image')
+                Forms\Components\FileUpload::make('image')
                     ->required()
                     ->image()
                     ->openable()
                     ->maxSize(1024)
                     ->directory('events')
                     ->imageCropAspectRatio('16:9'),
-                DateTimePicker::make('start_event')
+                Forms\Components\DateTimePicker::make('start_event')
                     ->required()
                     ->native(false)
                     ->seconds(false)
-                    ->beforeOrEqual('end_event'),
-                DateTimePicker::make('end_event')
+                    ->minDate(now())
+                    ->beforeOrEqual('end_event')
+                    ->closeOnDateSelection(),
+                Forms\Components\DateTimePicker::make('end_event')
                     ->required()
                     ->native(false)
                     ->seconds(false)
-                    ->afterOrEqual('start_event'),
-                RichEditor::make('description')
+                    ->minDate(now())
+                    ->afterOrEqual('start_event')
+                    ->closeOnDateSelection(),
+                Forms\Components\RichEditor::make('description')
                     ->required(),
-                RichEditor::make('highlight')
+                Forms\Components\RichEditor::make('highlight')
                     ->required(),
-                TextInput::make('slug')
+                Forms\Components\TextInput::make('slug')
                     ->required()
                     ->hidden(),
             ])->model(Event::class);
@@ -83,21 +80,21 @@ class EventResource extends Resource
     {
         return $table
             ->columns([
-                ImageColumn::make('image')
+                Tables\Columns\ImageColumn::make('image')
                     ->size(64),
-                TextColumn::make('title')
+                Tables\Columns\TextColumn::make('title')
                     ->description(fn (Event $record) => Str::limit(strip_tags($record->description), 50))
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('location')
+                Tables\Columns\TextColumn::make('location')
                     ->sortable(),
-                TextColumn::make('start_event')
+                Tables\Columns\TextColumn::make('start_event')
                     ->dateTime('F, j Y')
                     ->sortable(),
-                TextColumn::make('end_event')
+                Tables\Columns\TextColumn::make('end_event')
                     ->dateTime('F, j Y')
                     ->sortable(),
-                TextColumn::make('status')
+                Tables\Columns\TextColumn::make('status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'published' => 'success',

@@ -13,6 +13,15 @@ return new class extends Migration
     {
         Schema::create('event_packages', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('event_id')->constrained('events');
+            $table->string('title');
+            $table->string('description');
+            $table->unsignedBigInteger('price');
+            $table->unsignedBigInteger('capacity');
+            $table->unsignedBigInteger('remaining');
+            $table->dateTime('start_valid');
+            $table->dateTime('end_valid');
+            $table->string('slug')->unique();
             $table->timestamps();
         });
     }

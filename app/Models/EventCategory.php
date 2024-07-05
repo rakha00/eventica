@@ -16,4 +16,9 @@ class EventCategory extends Model
     {
         return $this->hasMany(Event::class);
     }
+
+    public function packages(): HasMany
+    {
+        return $this->hasMany(EventPackage::class);
+    }
 }

@@ -47,6 +47,7 @@ class EventResource extends Resource
                     ->live(debounce: 500)
                     ->afterStateUpdated(fn (Set $set, ?string $state) => $set('slug', Str::slug($state))),
                 Select::make('location')
+                    ->required()
                     ->options($provinceOptions),
                 Select::make('event_category_id')
                     ->relationship('category', 'title')
@@ -61,16 +62,20 @@ class EventResource extends Resource
                 DateTimePicker::make('start_event')
                     ->required()
                     ->native(false)
-                    ->seconds(false),
+                    ->seconds(false)
+                    ->beforeOrEqual('end_event'),
                 DateTimePicker::make('end_event')
                     ->required()
                     ->native(false)
-                    ->seconds(false),
+                    ->seconds(false)
+                    ->afterOrEqual('start_event'),
                 RichEditor::make('description')
                     ->required(),
                 RichEditor::make('highlight')
                     ->required(),
-                Hidden::make('slug'),
+                TextInput::make('slug')
+                    ->required()
+                    ->hidden(),
             ])->model(Event::class);
     }
 

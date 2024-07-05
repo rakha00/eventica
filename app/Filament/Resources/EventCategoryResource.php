@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\EventCategoryResource\Pages;
 use App\Filament\Resources\EventCategoryResource\RelationManagers;
+use Filament\Notifications\Notification;
 
 class EventCategoryResource extends Resource
 {
@@ -50,13 +51,19 @@ class EventCategoryResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\DeleteAction::make()
+                    ->before(function ($action, $record) {
+                        if ($record->events()->exists()) {
+                            Notification::make()
+                                ->danger()
+                                ->title('Something went wrong')
+                                ->body('The category cannot be deleted because it has related events.')
+                                ->send();
+                            $action->halt();
+                        }
+                    })
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
-            ])
+            ->bulkActions([])
             ->defaultSort('title', 'asc');
     }
 

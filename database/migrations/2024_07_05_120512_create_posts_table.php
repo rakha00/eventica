@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users');
             $table->string('title');
-            $table->string('status');
             $table->text('content');
+            $table->string('status');
             $table->timestamps();
         });
     }

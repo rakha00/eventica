@@ -96,7 +96,7 @@ class EventResource extends Resource
                 Tables\Columns\TextColumn::make('eventCategory.title')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('title')
-                    ->description(fn (Event $record): string => Str::limit($record->description, 20))
+                    ->description(fn (Event $record): string => strip_tags(Str::limit($record->description, 20)))
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('start_event')
@@ -158,7 +158,13 @@ class EventResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
-                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\Action::make('event_packages')
+                        ->label('Event Packages')
+                        ->color('info')
+                        ->icon('heroicon-s-arrow-uturn-right')
+                        ->url(fn (Event $record): string => url('admin/event-packages?tableFilters[event_id][value]=' . $record->id)),
+                    Tables\Actions\EditAction::make()
+                        ->color('warning'),
                     Tables\Actions\DeleteAction::make(),
                 ])
             ])

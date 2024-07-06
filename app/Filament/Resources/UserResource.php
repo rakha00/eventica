@@ -35,9 +35,12 @@ class UserResource extends Resource
                     ->password()
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('role')
+                Forms\Components\Select::make('role')
                     ->required()
-                    ->maxLength(255)
+                    ->options([
+                        'user' => 'User',
+                        'admin' => 'Admin',
+                    ])
                     ->default('user'),
             ]);
     }
@@ -54,6 +57,9 @@ class UserResource extends Resource
                     ->dateTime()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('role')
+                    ->badge()
+                    ->color(fn (User $record): string => $record->role === 'admin' ? 'danger' : 'info')
+                    ->formatStateUsing(fn (string $state): string => ucfirst($state))
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -68,8 +74,11 @@ class UserResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\EditAction::make()
+                        ->color('warning'),
+                    Tables\Actions\DeleteAction::make(),
+                ])
             ])
             ->bulkActions([
                 //

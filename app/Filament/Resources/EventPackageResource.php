@@ -136,7 +136,7 @@ class EventPackageResource extends Resource
                     Tables\Actions\Action::make('event')
                         ->label('Event')
                         ->color('info')
-                        ->icon('heroicon-c-link')
+                        ->icon('heroicon-s-arrow-uturn-right')
                         ->url(fn (EventPackage $record): string => url('/admin/events?tableSearch=' . $record->event->title)),
                     Tables\Actions\EditAction::make()
                         ->color('warning')

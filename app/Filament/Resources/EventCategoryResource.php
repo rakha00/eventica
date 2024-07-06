@@ -64,18 +64,26 @@ class EventCategoryResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make()
-                    ->before(function ($action, $record) {
-                        if ($record->events()->exists()) {
-                            Notification::make()
-                                ->danger()
-                                ->title('Something went wrong')
-                                ->body('The category cannot be deleted because it has related events.')
-                                ->send();
-                            $action->cancel();
-                        }
-                    })
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\Action::make('events')
+                        ->label('Events')
+                        ->color('info')
+                        ->icon('heroicon-s-arrow-uturn-right')
+                        ->url(fn (EventCategory $record): string => url('admin/events?tableFilters[category][value]=' . $record->id)),
+                    Tables\Actions\EditAction::make()
+                        ->color('warning'),
+                    Tables\Actions\DeleteAction::make()
+                        ->before(function ($action, $record) {
+                            if ($record->events()->exists()) {
+                                Notification::make()
+                                    ->danger()
+                                    ->title('Something went wrong')
+                                    ->body('The category cannot be deleted because it has related events.')
+                                    ->send();
+                                $action->cancel();
+                            }
+                        })
+                ])
             ])
             ->bulkActions([])
             ->defaultSort('created_at', 'desc');

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Event extends Model
 {
@@ -12,8 +13,13 @@ class Event extends Model
 
     protected $guarded = ['created_at', 'updated_at'];
 
-    public function category(): BelongsTo
+    public function eventCategory(): BelongsTo
     {
         return $this->belongsTo(EventCategory::class);
+    }
+
+    public function packages(): HasMany
+    {
+        return $this->hasMany(EventPackage::class);
     }
 }

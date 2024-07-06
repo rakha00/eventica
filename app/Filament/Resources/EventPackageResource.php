@@ -15,6 +15,7 @@ use App\Filament\Resources\EventPackageResource\Pages;
 use App\Filament\Resources\EventPackageResource\RelationManagers;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
+use Filament\Notifications\Notification;
 use Filament\Support\RawJs;
 
 class EventPackageResource extends Resource
@@ -100,14 +101,21 @@ class EventPackageResource extends Resource
                     ->prefix('Rp'),
                 Forms\Components\TextInput::make('capacity')
                     ->required()
-                    ->numeric()
+                    ->integer()
+                    ->mask('9999999999')
                     ->minValue(1)
                     ->live(debounce: 500)
-                    ->afterStateUpdated(fn (Set $set, ?string $state) => $set('remaining', $state)),
-                Forms\Components\Hidden::make('remaining')
+                    ->disabled(fn (?EventPackage $record): bool => $record ? $record->capacity !== $record->remaining : false)
+                    ->afterStateUpdated(function (Set $set, ?string $state, ?EventPackage $record) {
+                        if ($record && $record->capacity !== $record->remaining) {
+                            return;
+                        }
+                        $set('remaining', $state);
+                    }),
+                Forms\Components\TextInput::make('remaining')
                     ->disabled()
                     ->dehydrated(),
-                Forms\Components\Hidden::make('slug')
+                Forms\Components\TextInput::make('slug')
                     ->disabled()
                     ->dehydrated(),
             ]);
@@ -126,7 +134,8 @@ class EventPackageResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('event.title')
-                    ->sortable(),
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('title')
                     ->description(fn (EventPackage $record): string => $record->description)
                     ->sortable()
@@ -148,11 +157,9 @@ class EventPackageResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
-                    ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime()
-                    ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
@@ -161,12 +168,31 @@ class EventPackageResource extends Resource
                     ->relationship('event', 'title'),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\Action::make('event')
+                        ->label('Event')
+                        ->color('info')
+                        ->icon('heroicon-c-link')
+                        ->url(fn (EventPackage $record): string => url('/admin/events?tableSearch=' . $record->event->title)),
+                    Tables\Actions\EditAction::make()
+                        ->color('warning')
+                        ->beforeFormFilled(function ($action, $record) {
+                            if ($record->event->status == 'published') {
+                                Notification::make()
+                                    ->warning()
+                                    ->title('Be Careful')
+                                    ->body('You are editing package of an event that is published')
+                                    ->send();
+                            }
+                        }),
+                    Tables\Actions\DeleteAction::make()
+                        ->color('danger'),
+                ])
             ])
             ->bulkActions([
                 //
-            ]);
+            ])
+            ->defaultSort('created_at', 'desc');;
     }
 
     public static function getPages(): array

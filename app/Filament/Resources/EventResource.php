@@ -15,6 +15,8 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\EventResource\RelationManagers;
 use App\Models\Event;
 use Filament\Forms\Components\Tabs\Tab;
+use Filament\Forms\Get;
+use Filament\Notifications\Notification;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class EventResource extends Resource
@@ -43,7 +45,7 @@ class EventResource extends Resource
                     ->required()
                     ->options($provinceOptions),
                 Forms\Components\Select::make('event_category_id')
-                    ->relationship('category', 'title')
+                    ->relationship('eventCategory', 'title')
                     ->required(),
                 Forms\Components\FileUpload::make('image')
                     ->required()
@@ -58,12 +60,13 @@ class EventResource extends Resource
                     ->seconds(false)
                     ->minDate(now())
                     ->beforeOrEqual('end_event')
+                    ->live()
                     ->closeOnDateSelection(),
                 Forms\Components\DateTimePicker::make('end_event')
                     ->required()
                     ->native(false)
                     ->seconds(false)
-                    ->minDate(now())
+                    ->minDate(fn (Get $get) => $get('start_event'))
                     ->afterOrEqual('start_event')
                     ->closeOnDateSelection(),
                 Forms\Components\RichEditor::make('description')
@@ -72,7 +75,13 @@ class EventResource extends Resource
                     ->required(),
                 Forms\Components\TextInput::make('slug')
                     ->required()
-                    ->hidden(),
+                    ->disabled()
+                    ->dehydrated(),
+                Forms\Components\TextInput::make('status')
+                    ->required()
+                    ->disabled()
+                    ->default('unpublished')
+                    ->dehydrated(),
             ])->model(Event::class);
     }
 
@@ -99,7 +108,23 @@ class EventResource extends Resource
                     ->color(fn (string $state): string => match ($state) {
                         'published' => 'success',
                         'unpublished' => 'danger',
-                    })
+                    }),
+                Tables\Columns\TextColumn::make('packages_sum_capacity')
+                    ->label('Capacity')
+                    ->sum('packages', 'capacity')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('packages_sum_remaining')
+                    ->label('Remaining')
+                    ->sum('packages', 'remaining')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('slug')
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->dateTime()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->dateTime()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //
@@ -113,11 +138,34 @@ class EventResource extends Resource
                             $record->save();
                         })
                         ->icon('heroicon-c-globe-alt')
-                        ->color(fn (Event $record) => $record->status === 'published' ? 'info' : 'success'),
+                        ->color(fn (Event $record) => $record->status === 'published' ? 'gray' : 'success'),
+                    Tables\Actions\Action::make('Event Packages')
+                        ->label('Event Packages')
+                        ->color('info')
+                        ->icon('heroicon-c-link')
+                        ->url(fn (Event $record): string => url('admin/event-packages?tableFilters[event_id][value]=' . $record->id)),
                     Tables\Actions\EditAction::make()
                         ->color('warning'),
                     Tables\Actions\DeleteAction::make()
-                        ->color('danger'),
+                        ->color('danger')
+                        ->before(function ($action, $record) {
+                            if ($record->status === 'published') {
+                                Notification::make()
+                                    ->danger()
+                                    ->title('Something went wrong')
+                                    ->body('The event cannot be deleted because it is published.')
+                                    ->send();
+                                $action->halt();
+                            }
+                            if ($record->packages()->exists()) {
+                                Notification::make()
+                                    ->danger()
+                                    ->title('Something went wrong')
+                                    ->body('The event cannot be deleted because it has related packages.')
+                                    ->send();
+                                $action->halt();
+                            }
+                        })
                 ]),
             ])
             ->bulkActions([

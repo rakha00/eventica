@@ -31,8 +31,10 @@ class EventCategoryResource extends Resource
                     ->maxLength(50)
                     ->live(debounce: 500)
                     ->afterStateUpdated(fn (Set $set, ?string $state) => $set('slug', Str::slug($state))),
-                Forms\Components\Hidden::make('slug')
+                Forms\Components\TextInput::make('slug')
                     ->required()
+                    ->disabled()
+                    ->dehydrated(),
             ]);
     }
 
@@ -45,6 +47,15 @@ class EventCategoryResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('events_count')
                     ->counts('events')
+                    ->label('Events'),
+                Tables\Columns\TextColumn::make('slug')
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->dateTime()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->dateTime()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //
@@ -59,12 +70,12 @@ class EventCategoryResource extends Resource
                                 ->title('Something went wrong')
                                 ->body('The category cannot be deleted because it has related events.')
                                 ->send();
-                            $action->halt();
+                            $action->cancel();
                         }
                     })
             ])
             ->bulkActions([])
-            ->defaultSort('title', 'asc');
+            ->defaultSort('created_at', 'desc');
     }
 
     public static function getPages(): array

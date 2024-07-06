@@ -21,7 +21,7 @@ return new class extends Migration
             $table->dateTime('start_event');
             $table->dateTime('end_event');
             $table->string('location');
-            $table->string('status')->default('unpublished');
+            $table->string('status');
             $table->string('slug')->unique();
             $table->timestamps();
         });

@@ -4,6 +4,8 @@ namespace App\Filament\Resources;
 
 use Filament\Forms;
 use Filament\Tables;
+use App\Models\Event;
+use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
@@ -13,12 +15,7 @@ use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\EventResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\EventResource\RelationManagers;
-use App\Models\Event;
-use Filament\Forms\Components\Tabs\Tab;
-use Filament\Forms\Get;
-use Filament\Notifications\Notification;
-use Illuminate\Database\Eloquent\Model;
-use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
+use Filament\Forms\Components\Select;
 
 class EventResource extends Resource
 {
@@ -30,7 +27,6 @@ class EventResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
-    protected static ?string $recordTitleAttribute = 'title';
 
     public static function form(Form $form): Form
     {
@@ -42,159 +38,143 @@ class EventResource extends Resource
 
         return $form
             ->schema([
-                Forms\Components\TextInput::make('title')
-                    ->required()
-                    ->autocomplete(false)
-                    ->maxLength(100)
-                    ->live(debounce: 500)
-                    ->afterStateUpdated(fn (Set $set, ?string $state) => $set('slug', Str::slug($state))),
-                Forms\Components\Select::make('location')
-                    ->required()
-                    ->options($provinceOptions),
                 Forms\Components\Select::make('event_category_id')
                     ->relationship('eventCategory', 'title')
                     ->required(),
-                Forms\Components\FileUpload::make('image')
+                Forms\Components\TextInput::make('title')
                     ->required()
-                    ->image()
-                    ->openable()
-                    ->maxSize(1024)
-                    ->directory('events')
-                    ->imageCropAspectRatio('16:9'),
+                    ->maxLength(255)
+                    ->live(debounce: 500)
+                    ->afterStateUpdated(fn (Set $set, $state) => $set('slug', Str::slug($state))),
                 Forms\Components\DateTimePicker::make('start_event')
                     ->required()
-                    ->native(false)
-                    ->seconds(false)
                     ->minDate(now())
-                    ->beforeOrEqual('end_event')
-                    ->live()
-                    ->closeOnDateSelection(),
+                    ->live(debounce: 500),
                 Forms\Components\DateTimePicker::make('end_event')
                     ->required()
-                    ->native(false)
-                    ->seconds(false)
-                    ->minDate(fn (Get $get) => $get('start_event'))
-                    ->afterOrEqual('start_event')
-                    ->closeOnDateSelection(),
+                    ->minDate(fn (Get $get) => $get('start_event')),
+                Forms\Components\Select::make('location')
+                    ->required()
+                    ->options($provinceOptions),
+                Forms\Components\FileUpload::make('image')
+                    ->image()
+                    ->required()
+                    ->imageCropAspectRatio('16:9')
+                    ->maxSize(1024),
                 Forms\Components\RichEditor::make('description')
-                    ->required(),
+                    ->required()
+                    ->columnSpanFull(),
                 Forms\Components\RichEditor::make('highlight')
-                    ->required(),
+                    ->required()
+                    ->columnSpanFull(),
+                Forms\Components\Select::make('status')
+                    ->required()
+                    ->options([
+                        'unpublished' => 'Unpublished',
+                        'published' => 'Published',
+                    ])
+                    ->default('unpublished')
+                    ->disableOptionWhen(function (string $value, ?Event $record): bool {
+                        if ($record) {
+                            return false;
+                        }
+                        return $value === 'published';
+                    })
+                    ->selectablePlaceholder(false),
                 Forms\Components\TextInput::make('slug')
                     ->required()
-                    ->disabled()
-                    ->dehydrated(),
-                Forms\Components\TextInput::make('status')
-                    ->required()
-                    ->disabled()
-                    ->default('unpublished')
-                    ->dehydrated(),
-            ])->model(Event::class);
+                    ->maxLength(255)
+                    ->readOnly(),
+            ]);
     }
 
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                Tables\Columns\ImageColumn::make('image')
-                    ->size(64),
+                Tables\Columns\ImageColumn::make('image'),
+                Tables\Columns\TextColumn::make('eventCategory.title')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('title')
-                    ->description(fn (Event $record) => Str::limit(strip_tags($record->description), 50))
-                    ->searchable()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('location')
-                    ->sortable(),
+                    ->description(fn (Event $record): string => Str::limit($record->description, 20))
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('start_event')
-                    ->dateTime('F, j Y')
+                    ->dateTime('M j, Y')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('end_event')
-                    ->dateTime('F, j Y')
+                    ->dateTime('M j, Y')
                     ->sortable(),
+                Tables\Columns\TextColumn::make('location'),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'published' => 'success',
                         'unpublished' => 'danger',
+                        'published' => 'success',
                     }),
-                Tables\Columns\TextColumn::make('packages_sum_capacity')
-                    ->label('Capacity')
-                    ->sum('packages', 'capacity')
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('packages_sum_remaining')
-                    ->label('Remaining')
-                    ->sum('packages', 'remaining')
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('slug')
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
+                    ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime()
+                    ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->defaultSort('created_at', 'desc')
             ->filters([
-                //
+                Tables\Filters\Filter::make('event_date')
+                    ->form([
+                        Forms\Components\DatePicker::make('start_event'),
+                        Forms\Components\DatePicker::make('end_event'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['start_event'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('start_event', '>=', $date),
+                            )
+                            ->when(
+                                $data['end_event'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('end_event', '<=', $date),
+                            );
+                    })
+                    ->indicateUsing(function (array $data): ?string {
+                        if (!$data['start_event']) {
+                            return null;
+                        }
+
+                        return \Carbon\Carbon::parse($data['start_event'])->toFormattedDateString() . ' to ' . \Carbon\Carbon::parse($data['end_event'])->toFormattedDateString();
+                    }),
+                Tables\Filters\SelectFilter::make('category')
+                    ->relationship('eventCategory', 'title'),
+                Tables\Filters\SelectFilter::make('status')
+                    ->options([
+                        'unpublished' => 'Unpublished',
+                        'published' => 'Published',
+                    ]),
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
-                    Tables\Actions\Action::make('Publish/Unpublish')
-                        ->label(fn (Event $record) => $record->status === 'published' ? 'Unpublish' : 'Publish')
-                        ->action(function (Event $record) {
-                            $record->status = $record->status === 'published' ? 'unpublished' : 'published';
-                            $record->save();
-                        })
-                        ->icon('heroicon-c-globe-alt')
-                        ->color(fn (Event $record) => $record->status === 'published' ? 'gray' : 'success'),
-                    Tables\Actions\Action::make('Event Packages')
-                        ->label('Event Packages')
-                        ->color('info')
-                        ->icon('heroicon-c-link')
-                        ->url(fn (Event $record): string => url('admin/event-packages?tableFilters[event_id][value]=' . $record->id)),
-                    Tables\Actions\EditAction::make()
-                        ->color('warning'),
-                    Tables\Actions\DeleteAction::make()
-                        ->color('danger')
-                        ->before(function ($action, $record) {
-                            if ($record->status === 'published') {
-                                Notification::make()
-                                    ->danger()
-                                    ->title('Something went wrong')
-                                    ->body('The event cannot be deleted because it is published.')
-                                    ->send();
-                                $action->halt();
-                            }
-                            if ($record->packages()->exists()) {
-                                Notification::make()
-                                    ->danger()
-                                    ->title('Something went wrong')
-                                    ->body('The event cannot be deleted because it has related packages.')
-                                    ->send();
-                                $action->halt();
-                            }
-                        })
-                ]),
+                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\DeleteAction::make(),
+                ])
             ])
             ->bulkActions([
                 //
             ]);
     }
 
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
-    }
-
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListEvents::route('/'),
-            'create' => Pages\CreateEvent::route('/create'),
-            'edit' => Pages\EditEvent::route('/{record}/edit'),
+            'index' => Pages\ManageEvents::route('/'),
         ];
     }
+
+    protected static ?string $recordTitleAttribute = 'title';
 
     public static function getGloballySearchableAttributes(): array
     {

@@ -43,7 +43,7 @@ class EventResource extends Resource
                     ->required(),
                 Forms\Components\TextInput::make('title')
                     ->required()
-                    ->maxLength(255)
+                    ->maxLength(50)
                     ->live(debounce: 500)
                     ->afterStateUpdated(fn (Set $set, $state) => $set('slug', Str::slug($state))),
                 Forms\Components\DateTimePicker::make('start_event')

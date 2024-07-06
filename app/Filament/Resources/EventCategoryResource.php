@@ -37,8 +37,7 @@ class EventCategoryResource extends Resource
                     ->afterStateUpdated(fn (Set $set, ?string $state) => $set('slug', Str::slug($state))),
                 Forms\Components\TextInput::make('slug')
                     ->required()
-                    ->disabled()
-                    ->dehydrated(),
+                    ->readOnly(),
             ]);
     }
 

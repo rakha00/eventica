@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\EventPackageResource\Pages;
 use App\Filament\Resources\EventPackageResource\RelationManagers;
+use App\Models\Event;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification;
@@ -35,102 +36,60 @@ class EventPackageResource extends Resource
                 Forms\Components\Select::make('event_id')
                     ->relationship('event', 'title')
                     ->required()
-                    ->live()
+                    ->live(debounce: 500)
                     ->afterStateUpdated(function (Set $set, ?string $state) {
-                        if ($state === null) {
+                        if ($state) {
+                            $set('start_valid', Event::find($state)->start_event);
+                            $set('end_valid', Event::find($state)->end_event);
+                        } else {
                             $set('start_valid', null);
                             $set('end_valid', null);
-                        } else {
-                            $set('start_event', \App\Models\Event::find($state)->start_event);
-                            $set('start_valid', \App\Models\Event::find($state)->start_event);
-                            $set('end_event', \App\Models\Event::find($state)->end_event);
-                            $set('end_valid', \App\Models\Event::find($state)->end_event);
                         }
                     }),
                 Forms\Components\TextInput::make('title')
                     ->required()
                     ->maxLength(50)
+                    ->autocomplete(false)
                     ->live(debounce: 500)
                     ->afterStateUpdated(fn (Set $set, ?string $state) => $set('slug', Str::slug($state))),
                 Forms\Components\DateTimePicker::make('start_valid')
                     ->required()
-                    ->disabled(fn (Get $get): bool => !$get('event_id'))
-                    ->native(false)
-                    ->minDate(function (Get $get): ?string {
-                        if ($get('start_event')) {
-                            return $get('start_event');
-                        }
-                        if ($get('event_id')) {
-                            $event = \App\Models\Event::find($get('event_id'));
-                            return $event->start_event;
-                        }
-                        return null;
-                    })
-                    ->maxDate(function (Get $get): ?string {
-                        if ($get('end_event')) {
-                            return $get('end_event');
-                        }
-                        if ($get('event_id')) {
-                            $event = \App\Models\Event::find($get('event_id'));
-                            return $event->end_event;
-                        }
-                        return null;
-                    })
+                    ->minDate(fn (Get $get): ?string => $get('event_id') ? Event::find($get('event_id'))->start_event : null)
+                    ->maxDate(fn (Get $get): ?string => $get('event_id') ? Event::find($get('event_id'))->end_event : null)
                     ->beforeOrEqual('end_valid')
-                    ->live(),
+                    ->live(debounce: 500),
                 Forms\Components\DateTimePicker::make('end_valid')
                     ->required()
-                    ->disabled(fn (Get $get): bool => !$get('event_id'))
-                    ->native(false)
-                    ->minDate(fn (Get $get): ?string => $get('start_valid') ?? $get('start_event'))
-                    ->maxDate(function (Get $get): ?string {
-                        if ($get('end_event')) {
-                            return $get('end_event');
-                        }
-                        if ($get('event_id')) {
-                            $event = \App\Models\Event::find($get('event_id'));
-                            return $event->end_event;
-                        }
-                        return null;
-                    })
+                    ->minDate(fn (Get $get): ?string => $get('event_id') ? Event::find($get('event_id'))->start_event : null)
+                    ->maxDate(fn (Get $get): ?string => $get('event_id') ? Event::find($get('event_id'))->end_event : null)
                     ->afterOrEqual('start_valid'),
                 Forms\Components\TextInput::make('description')
                     ->required()
+                    ->autocomplete(false)
                     ->maxLength(100),
                 Forms\Components\TextInput::make('price')
                     ->required()
+                    ->numeric()
                     ->mask(RawJs::make('$money($input)'))
                     ->stripCharacters(',')
-                    ->numeric()
                     ->prefix('Rp'),
                 Forms\Components\TextInput::make('capacity')
                     ->required()
-                    ->integer()
+                    ->numeric()
                     ->mask('9999999999')
                     ->minValue(1)
                     ->live(debounce: 500)
-                    ->disabled(fn (?EventPackage $record): bool => $record ? $record->capacity !== $record->remaining : false)
+                    ->readOnly(fn (?EventPackage $record): bool => $record ? true : false)
                     ->afterStateUpdated(function (Set $set, ?string $state, ?EventPackage $record) {
-                        if ($record && $record->capacity !== $record->remaining) {
-                            return;
+                        if (!$record) {
+                            $set('remaining', $state);
                         }
-                        $set('remaining', $state);
                     }),
                 Forms\Components\TextInput::make('remaining')
-                    ->disabled()
-                    ->dehydrated(),
+                    ->readOnly(),
                 Forms\Components\TextInput::make('slug')
-                    ->disabled()
-                    ->dehydrated(),
+                    ->readOnly(),
             ]);
-    }
-
-    protected function mutateFormDataBeforeCreate(array $data): array
-    {
-        $data['slug'] = Str::slug($data['title']);
-        $data['remaining'] = $data['capacity'];
-
-        return $data;
     }
 
     public static function table(Table $table): Table
@@ -138,8 +97,7 @@ class EventPackageResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('event.title')
-                    ->sortable()
-                    ->searchable(),
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('title')
                     ->description(fn (EventPackage $record): string => $record->description)
                     ->sortable()
@@ -153,10 +111,12 @@ class EventPackageResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('start_valid')
                     ->dateTime()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('end_valid')
                     ->dateTime()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('slug')
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('created_at')
@@ -180,7 +140,7 @@ class EventPackageResource extends Resource
                         ->url(fn (EventPackage $record): string => url('/admin/events?tableSearch=' . $record->event->title)),
                     Tables\Actions\EditAction::make()
                         ->color('warning')
-                        ->beforeFormFilled(function ($action, $record) {
+                        ->beforeFormFilled(function ($record) {
                             if ($record->event->status == 'published') {
                                 Notification::make()
                                     ->warning()

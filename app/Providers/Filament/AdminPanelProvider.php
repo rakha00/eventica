@@ -53,6 +53,10 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-            ]);
+            ])
+            ->spa()
+            ->brandLogo(asset('img/logo_text.webp'))
+            ->brandLogoHeight('3rem')
+            ->font('Poppins');
     }
 }

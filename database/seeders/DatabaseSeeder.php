@@ -24,11 +24,23 @@ class DatabaseSeeder extends Seeder
             $event->event_category_id = $categories->random()->id;
             $event->save();
 
-            EventPackage::factory(3)->create([
-                'start_valid' => fake()->dateTimeBetween($event->start_event, $event->end_event),
-                'end_valid' => fake()->dateTimeBetween($event->start_event, $event->end_event),
-                'event_id' => $event->id,
-            ]);
+            EventPackage::factory(3)->make()->each(function ($package) use ($event) {
+                $startValid = fake()->dateTimeBetween($event->start_event, $event->end_event);
+                $endValid = (clone $startValid)->modify('+' . fake()->numberBetween(3, 5) . ' days');
+
+                // Ensure start_valid is not less than start_event and end_valid is not more than end_event
+                if ($startValid < $event->start_event) {
+                    $startValid = $event->start_event;
+                }
+                if ($endValid > $event->end_event) {
+                    $endValid = $event->end_event;
+                }
+
+                $package->event_id = $event->id;
+                $package->start_valid = $startValid;
+                $package->end_valid = $endValid;
+                $package->save();
+            });
         });
 
 

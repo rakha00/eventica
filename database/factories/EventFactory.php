@@ -29,8 +29,8 @@ class EventFactory extends Factory
             'description' => fake()->paragraph(),
             'highlight' => fake()->paragraph(),
             'image' => fake()->imageUrl(),
-            'start_event' => $startEvent = fake()->dateTimeBetween('now', '+1 week'),
-            'end_event' => fake()->dateTimeBetween($startEvent, '+1 week'),
+            'start_event' => $startEvent = fake()->dateTimeBetween('now', '+1 month'),
+            'end_event' => fake()->dateTimeBetween($startEvent, '+1 month'),
             'location' => $provinceOptions->random(),
             'status' => fake()->randomElement(['published', 'unpublished']),
         ];

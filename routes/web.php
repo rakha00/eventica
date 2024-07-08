@@ -1,15 +1,14 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\HomeController;
 
-Route::view('/', 'welcome');
+Route::get('/', [HomeController::class, 'home'])->name('home');
+Route::get('/profile', [HomeController::class, 'profile'])->middleware('auth')->name('profile');
+Route::get('/event-detail/{eventSlug}', [HomeController::class, 'eventDetail'])->name('event-detail');
 
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
-Route::view('profile', 'profile')
-    ->middleware(['auth'])
-    ->name('profile');
-
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

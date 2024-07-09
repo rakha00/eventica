@@ -1,14 +1,12 @@
 <x-app-layout>
     <livewire:layout.header />
 
-    <div class="container mx-auto my-8 flex justify-center p-4">
-        <div class="w-full max-w-3xl rounded-lg border-2 border-tertiary bg-gray-900">
-            <div class="flex justify-between gap-4 rounded-md bg-gray-800 p-6">
-                <h1 class="text-2xl font-bold text-white">Book Contact</h1>
+    <div class="mx-auto flex justify-center px-4 py-10">
+        <div class="e w-full max-w-3xl rounded-lg bg-gray-100 shadow-lg dark:bg-gray-900">
+            <div class="flex justify-between gap-4 rounded-t-md bg-gray-50 p-6 shadow-md dark:bg-gray-800">
+                <h1 class="text-xl font-bold text-gray-900 dark:text-white sm:text-2xl">Book Contact</h1>
             </div>
-            <div class="p-6">
-                <livewire:transaction.book-contact />
-            </div>
+            <livewire:transaction.contact />
         </div>
     </div>
 </x-app-layout>

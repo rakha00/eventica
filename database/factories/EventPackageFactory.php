@@ -21,8 +21,8 @@ class EventPackageFactory extends Factory
             'title' => $title = fake()->text(20),
             'price' => fake()->randomNumber(5, true),
             'description' => fake()->text(50),
-            'capacity' => fake()->randomNumber(2, true),
-            'remaining' => fake()->randomNumber(2, true),
+            'capacity' => $capacity = fake()->randomNumber(1, true),
+            'remaining' => $capacity,
             'slug' => Str::slug($title),
         ];
     }

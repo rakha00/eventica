@@ -52,8 +52,7 @@ new class extends Component {
             <div class="flex flex-col items-center justify-between gap-2 sm:flex-row">
                 <p class="w-full justify-start text-xl font-bold text-secondary dark:text-primary">{{ 'Rp ' . number_format($package->price, 0, ',', '.') }}</p>
                 <a class="inline-flex w-full items-center justify-center rounded-lg bg-secondary px-3 py-2 text-center font-medium text-white hover:bg-secondary/80 dark:bg-primary dark:text-gray-900 sm:max-w-fit"
-                    href="#">
-                    {{-- href="{{ route('book-detail', [$event->slug, $package->slug]) }}"> --}}
+                    href="{{ route('book-detail', [$event->slug, $package->slug]) }}" wire:navigate>
                     Select Package
                 </a>
             </div>

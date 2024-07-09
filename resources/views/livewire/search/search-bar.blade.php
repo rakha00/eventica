@@ -16,11 +16,11 @@ new class extends Component {
     <div class="flex">
         <label class="sr-only mb-2 text-sm font-medium text-gray-900 dark:text-white" for="search-dropdown">Category</label>
         <button
-            class="z-10 hidden flex-shrink-0 items-center rounded-s-lg border border-secondary bg-gray-200 px-4 py-2.5 text-center text-sm font-medium text-gray-900 hover:bg-gray-200 dark:border-primary dark:bg-gray-900 dark:text-white dark:hover:bg-gray-800 sm:inline-flex"
-            id="dropdown-button" data-dropdown-toggle="dropdown" type="button">All categories <svg class="ms-2.5 h-2.5 w-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                viewBox="0 0 10 6">
-                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4" />
-            </svg></button>
+            class="z-10 hidden flex-shrink-0 items-center rounded-s-lg border border-secondary bg-gray-50 px-4 py-2.5 text-center text-sm font-medium text-gray-900 hover:bg-gray-200 dark:border-primary dark:bg-gray-900 dark:text-white dark:hover:bg-gray-800 sm:inline-flex"
+            id="dropdown-button" data-dropdown-toggle="dropdown" type="button">
+            All categories
+            <x-heroicon-s-chevron-down class="ms-2 h-4 w-4" />
+        </button>
         <div class="z-50 hidden w-44 divide-y divide-gray-100 rounded-lg border border-secondary bg-white shadow dark:border-primary dark:bg-gray-900" id="dropdown">
             <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdown-button">
                 @foreach ($categories as $category)

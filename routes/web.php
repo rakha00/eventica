@@ -2,13 +2,16 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\TransactionController;
 
 Route::get('/', [HomeController::class, 'home'])->name('home');
-Route::get('/profile', [HomeController::class, 'profile'])->middleware('auth')->name('profile');
-Route::get('/event-detail/{eventSlug}', [HomeController::class, 'eventDetail'])->name('event-detail');
+Route::get('/event/{eventSlug}', [HomeController::class, 'eventDetail'])->name('event-detail');
+Route::get('/book-payment', [TransactionController::class, 'bookPayment'])->name('book-payment');
 
-Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/profile', [HomeController::class, 'profile'])->name('profile');
+    Route::get('/book/{eventSlug}/{packageSlug}', [TransactionController::class, 'bookDetail'])->name('book-detail');
+    Route::get('/book/{eventSlug}/{packageSlug}/{orderId}', [TransactionController::class, 'bookContact'])->name('book-contact');
+});
 
 require __DIR__ . '/auth.php';

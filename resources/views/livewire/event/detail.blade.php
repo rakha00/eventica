@@ -25,20 +25,20 @@ new class extends Component {
             data-tabs-inactive-classes="dark:border-transparent text-gray-800 hover:text-gray-600 dark:text-gray-200 border-transparent hover:border-secondary dark:border-gray-700 dark:hover:text-gray-100"
             role="tablist">
             <li class="me-2" role="presentation">
-                <button class="inline-block rounded-t-lg border-b-2 p-4" id="summary-styled-tab" data-tabs-target="#styled-summary" type="button" role="tab" aria-controls="summary"
+                <button class="inline-block rounded-t-lg border-b-2 p-4 sm:text-lg" id="summary-styled-tab" data-tabs-target="#styled-summary" type="button" role="tab" aria-controls="summary"
                     aria-selected="false">Summary</button>
             </li>
             <li class="me-2" role="presentation">
-                <button class="inline-block rounded-t-lg border-b-2 p-4 hover:text-gray-600 dark:hover:text-gray-100" id="package-styled-tab" data-tabs-target="#styled-package" type="button"
-                    role="tab" aria-controls="package" aria-selected="false">Package</button>
+                <button class="inline-block rounded-t-lg border-b-2 p-4 hover:text-gray-600 dark:hover:text-gray-100 sm:text-lg" id="package-styled-tab" data-tabs-target="#styled-package"
+                    type="button" role="tab" aria-controls="package" aria-selected="false">Package</button>
             </li>
             <li class="me-2" role="presentation">
-                <button class="inline-block rounded-t-lg border-b-2 p-4 hover:text-gray-600 dark:hover:text-gray-100" id="location-styled-tab" data-tabs-target="#styled-location" type="button"
-                    role="tab" aria-controls="location" aria-selected="false">Location</button>
+                <button class="inline-block rounded-t-lg border-b-2 p-4 hover:text-gray-600 dark:hover:text-gray-100 sm:text-lg" id="location-styled-tab" data-tabs-target="#styled-location"
+                    type="button" role="tab" aria-controls="location" aria-selected="false">Location</button>
             </li>
             <li role="presentation">
-                <button class="inline-block rounded-t-lg border-b-2 p-4 hover:text-gray-600 dark:hover:text-gray-100" id="upcoming-styled-tab" data-tabs-target="#styled-upcoming" type="button"
-                    role="tab" aria-controls="upcoming" aria-selected="false">Upcoming</button>
+                <button class="inline-block rounded-t-lg border-b-2 p-4 hover:text-gray-600 dark:hover:text-gray-100 sm:text-lg" id="upcoming-styled-tab" data-tabs-target="#styled-upcoming"
+                    type="button" role="tab" aria-controls="upcoming" aria-selected="false">Upcoming</button>
             </li>
         </ul>
     </div>

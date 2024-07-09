@@ -15,10 +15,10 @@ return new class extends Migration
             $table->id();
             $table->foreignId('transaction_id')->constrained('transactions');
             $table->string('ticket_id')->unique();
-            $table->string('name');
-            $table->string('email');
-            $table->string('phone');
-            $table->string('identity_card_number');
+            $table->string('name')->nullable();
+            $table->string('email')->nullable();
+            $table->string('phone')->nullable();
+            $table->string('identity_card_number')->nullable();
             $table->string('status');
             $table->timestamps();
         });

@@ -18,7 +18,7 @@ class Event extends Model
         return $this->belongsTo(EventCategory::class);
     }
 
-    public function packages(): HasMany
+    public function eventPackages(): HasMany
     {
         return $this->hasMany(EventPackage::class);
     }

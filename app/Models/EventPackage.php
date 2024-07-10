@@ -17,4 +17,9 @@ class EventPackage extends Model
     {
         return $this->belongsTo(Event::class);
     }
+
+    public function transactions(): HasMany
+    {
+        return $this->hasMany(Transaction::class);
+    }
 }

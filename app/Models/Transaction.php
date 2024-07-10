@@ -16,4 +16,9 @@ class Transaction extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function eventPackage(): BelongsTo
+    {
+        return $this->belongsTo(EventPackage::class);
+    }
 }

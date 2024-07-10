@@ -21,7 +21,7 @@ new class extends Component {
                 'name' => $index == 0 ? $this->transaction->user->name : $ticket->name,
                 'phone' => $index == 0 ? $this->transaction->user->phone : $ticket->phone,
                 'email' => $index == 0 ? $this->transaction->user->email : $ticket->email,
-                'identity_card_number' => $ticket->identity_card_number,
+                'identity_card_number' => $index == 0 ? $this->transaction->user->identity_card_number : $ticket->identity_card_number,
             ];
             $this->ticketIds[] = $ticket->id;
         }
@@ -44,7 +44,7 @@ new class extends Component {
 
     public function updateTransaction()
     {
-        $this->transaction->update(['status' => 'on payment']);
+        $this->transaction->update(['status' => 'On payment']);
     }
 
     public function fillAllInformation()
@@ -63,7 +63,7 @@ new class extends Component {
         $this->updateUser();
         $this->updateTicket();
         $this->updateTransaction();
-        return redirect()->route('book-payment', $this->transaction->order_id);
+        $this->redirect(route('book-payment', ['orderId' => $this->transaction->order_id]), navigate: true);
     }
 };
 ?>
@@ -77,6 +77,13 @@ new class extends Component {
     <h2 class="mb-2 text-2xl font-semibold text-gray-900 dark:text-white">Visitor Details</h2>
     <p class="text-xs text-gray-500 dark:text-gray-300">Make sure to fill in the visitor details correctly for a smooth experience.
         First ticket information will be used for the transaction details and we will update your user information.</p>
+    <div class="mt-4 rounded-md bg-gray-50 p-4 shadow-lg dark:bg-gray-800">
+        <div class="inline-flex w-full items-center justify-between">
+            <h3 class="text-xs font-semibold text-gray-900 dark:text-white sm:text-lg">Complete Payment In</h3>
+            <p class="shadow-slate-4000 rounded-md bg-gray-100 px-2 py-1 text-xs text-secondary shadow-inner dark:bg-gray-700 dark:text-primary dark:shadow-slate-500 sm:text-base" id="countdown" id>
+            </p>
+        </div>
+    </div>
     <!-- Visitor -->
     @foreach ($tickets as $index => $ticket)
         <div class="mt-4 space-y-4 rounded-md bg-gray-50 p-4 shadow-lg dark:bg-gray-800">
@@ -92,23 +99,22 @@ new class extends Component {
             @endif
             <input
                 class="w-full rounded-md border-none bg-gray-100 p-2 text-gray-900 shadow-inner shadow-slate-400 dark:bg-gray-700 dark:text-white dark:shadow-slate-500 dark:placeholder:text-gray-400"
-                type="text" wire:model="tickets.{{ $index }}.name" placeholder="Name" @if ($index == 0) value="{{ $transaction->user->name }}" @endif>
+                type="text" wire:model="tickets.{{ $index }}.name" placeholder="Name" @if ($index == 0) readonly @endif>
             <div class="relative">
                 <div class="pointer-events-none absolute inset-y-0 start-0 flex items-center ps-3">
                     <x-icon-flag-indonesia />
                 </div>
                 <input
                     class="block w-full rounded-md border-none bg-gray-100 p-2 ps-10 text-gray-900 shadow-inner shadow-slate-400 dark:bg-gray-700 dark:text-white dark:shadow-slate-500 dark:placeholder:text-gray-400"
-                    type="text" wire:model="tickets.{{ $index }}.phone" placeholder="Phone Number" @if ($index == 0) value="{{ $transaction->user->phone }}" @endif
-                    onkeypress="return event.charCode >= 48 && event.charCode <= 57" maxlength="15" />
+                    type="text" wire:model="tickets.{{ $index }}.phone" placeholder="Phone Number" onkeypress="return event.charCode >= 48 && event.charCode <= 57" maxlength="15" />
             </div>
             <input
                 class="w-full rounded-md border-none bg-gray-100 p-2 text-gray-900 shadow-inner shadow-slate-400 dark:bg-gray-700 dark:text-white dark:shadow-slate-500 dark:placeholder:text-gray-400"
-                type="email" wire:model="tickets.{{ $index }}.email" placeholder="Email" @if ($index == 0) value="{{ $transaction->user->email }}" readonly @endif>
+                type="email" wire:model="tickets.{{ $index }}.email" placeholder="Email" @if ($index == 0) readonly @endif>
             <input
                 class="w-full rounded-md border-none bg-gray-100 p-2 text-gray-900 shadow-inner shadow-slate-400 dark:bg-gray-700 dark:text-white dark:shadow-slate-500 dark:placeholder:text-gray-400"
-                type="text" wire:model="tickets.{{ $index }}.identity_card_number" placeholder="Identity Card Number"
-                @if ($index == 0) value="{{ $transaction->user->identity_card_number }}" @endif onkeypress="return event.charCode >= 48 && event.charCode <= 57" maxlength="16">
+                type="text" wire:model="tickets.{{ $index }}.identity_card_number" placeholder="Identity Card Number" onkeypress="return event.charCode >= 48 && event.charCode <= 57"
+                maxlength="16">
         </div>
     @endforeach
 
@@ -127,3 +133,29 @@ new class extends Component {
         </button>
     </form>
 </div>
+@push('scripts')
+    <script>
+        // Set waktu transaksi dibuat
+        var transactionCreatedAt = new Date("{{ $this->transaction->created_at }}");
+
+        // Hitung waktu akhir transaksi (1 jam setelah transaksi dibuat)
+        var transactionEndTime = new Date(transactionCreatedAt.getTime() + 60 * 60 * 1000);
+
+        // Update hitungan mundur setiap detik
+        var x = setInterval(function() {
+            var now = new Date().getTime();
+            var distance = transactionEndTime - now;
+
+            var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            document.getElementById("countdown").innerHTML = hours + "h " + minutes + "m " + seconds + "s ";
+
+            if (distance < 0) {
+                clearInterval(x);
+                document.getElementById("countdown").innerHTML = "EXPIRED";
+            }
+        }, 1000);
+    </script>
+@endpush

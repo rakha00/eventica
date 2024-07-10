@@ -11,10 +11,8 @@ new class extends Component {
 
     public function mount()
     {
-        $this->package = EventPackage::where('slug', request()->packageSlug)->first();
-        if (!$this->package) {
-            abort(404);
-        }
+        $this->package = EventPackage::where('slug', request()->packageSlug)->firstOrFail();
+
         $this->totalPrice = $this->package->price;
     }
 

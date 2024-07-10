@@ -11,9 +11,11 @@
         "codeat3/blade-google-material-design-icons": "^1.19",
         "filament/filament": "^3.2",
         "laravel/framework": "^11.9",
+        "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
         "livewire/livewire": "^3.5",
-        "livewire/volt": "^1.0"
+        "livewire/volt": "^1.0",
+        "midtrans/midtrans-php": "^2.5"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.13",

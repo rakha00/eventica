@@ -9,9 +9,9 @@ new class extends Component {
     public function mount()
     {
         $this->event = Event::where('slug', request()->eventSlug)
-            ->with('packages')
+            ->with('eventPackages')
             ->first();
-        $this->event->lowest_price = $this->event->packages->min('price');
+        $this->event->lowest_price = $this->event->eventPackages->min('price');
     }
 }; ?>
 
@@ -20,6 +20,7 @@ new class extends Component {
         <img class="aspect-video w-[1000px] rounded-lg" src="{{ asset($event->image) }}" alt="Event">
     </div>
     <div class="mb-4 border-b border-secondary dark:border-primary">
+        <!-- Nav Tabs -->
         <ul class="-mb-px flex overflow-x-scroll text-center text-sm font-medium sm:justify-center sm:overflow-auto" id="default-styled-tab" data-tabs-toggle="#default-styled-tab-content"
             data-tabs-active-classes="text-secondary hover:text-secondary dark:text-primary dark:hover:text-primary border-secondary dark:border-primary"
             data-tabs-inactive-classes="dark:border-transparent text-gray-800 hover:text-gray-600 dark:text-gray-200 border-transparent hover:border-secondary dark:border-gray-700 dark:hover:text-gray-100"
@@ -43,6 +44,7 @@ new class extends Component {
         </ul>
     </div>
     <div id="default-styled-tab-content">
+        <!-- Summary -->
         <div class="hidden rounded-lg bg-gray-50 p-4 shadow-lg dark:bg-gray-800 dark:shadow-slate-500" id="styled-summary" role="tabpanel" aria-labelledby="summary-tab">
             <div class="rounded-md bg-gray-100 p-6 shadow-inner shadow-slate-700 dark:bg-slate-700 dark:shadow-slate-500">
                 <div class="mb-2 flex" x-data="{ showTime: false }">
@@ -81,17 +83,16 @@ new class extends Component {
                 </div>
             </div>
         </div>
+        <!-- Packages -->
         <div class="hidden rounded-lg bg-gray-50 p-4 shadow-lg dark:bg-gray-800 dark:shadow-slate-500" id="styled-package" role="tabpanel" aria-labelledby="package-tab">
             <div class="rounded-md bg-gray-100 p-6 shadow-inner shadow-slate-700 dark:bg-slate-700 dark:shadow-slate-500">
                 <livewire:event.packages :event="$event" />
             </div>
         </div>
+        <!-- Location -->
         <div class="hidden rounded-lg bg-gray-50 p-4 shadow-lg dark:bg-gray-800 dark:shadow-slate-500" id="styled-location" role="tabpanel" aria-labelledby="location-tab">
             <div class="rounded-md bg-gray-100 p-6 shadow-inner shadow-slate-700 dark:bg-slate-700 dark:shadow-slate-500">
-                <iframe class="rounded-md"
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d253840.478949799!2d106.829518!3d-6.2297465!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69f3e945e34b9d%3A0x5371bf0fdad786a2!2sJakarta%2C%20Daerah%20Khusus%20Ibukota%20Jakarta!5e0!3m2!1sid!2sid!4v1719626322271!5m2!1sid!2sid"
-                    style="border:0;" width="100%" height="450" allowfullscreen="" referrerpolicy="no-referrer-when-downgrade">
-                </iframe>
+                <x-googlemaps />
                 <a class="mt-4 flex items-center gap-2 rounded-md bg-secondary py-2 text-white hover:bg-secondary/80 dark:bg-primary dark:text-gray-900 dark:hover:bg-primary/80"
                     href="https://maps.app.goo.gl/v1x4481111111111EA" target="_blank">
                     <span class="ms-2">
@@ -101,6 +102,7 @@ new class extends Component {
                 </a>
             </div>
         </div>
+        <!-- Upcoming -->
         <div class="hidden rounded-lg bg-gray-50 p-4 shadow-lg dark:bg-gray-800 dark:shadow-slate-500" id="styled-upcoming" role="tabpanel" aria-labelledby="upcoming-tab">
             <div class="rounded-md bg-gray-100 p-6 shadow-inner shadow-slate-700 dark:bg-slate-700 dark:shadow-slate-500">
                 <livewire:home.upcoming-events />

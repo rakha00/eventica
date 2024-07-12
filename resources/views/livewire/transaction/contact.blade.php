@@ -63,7 +63,7 @@ new class extends Component {
         $this->updateUser();
         $this->updateTicket();
         $this->updateTransaction();
-        $this->redirect(route('book-payment', ['orderId' => $this->transaction->order_id]), navigate: true);
+        $this->redirect(route('trasaction-payment', ['orderId' => $this->transaction->order_id]));
     }
 };
 ?>
@@ -77,17 +77,17 @@ new class extends Component {
     <h2 class="mb-2 text-2xl font-semibold text-gray-900 dark:text-white">Visitor Details</h2>
     <p class="text-xs text-gray-500 dark:text-gray-300">Make sure to fill in the visitor details correctly for a smooth experience.
         First ticket information will be used for the transaction details and we will update your user information.</p>
-    <div class="mt-4 rounded-md bg-gray-50 p-4 shadow-lg dark:bg-gray-800">
+    <div class="mt-4 rounded-md bg-gray-50 p-4 shadow-lg dark:bg-gray-800" wire:ignore>
         <div class="inline-flex w-full items-center justify-between">
             <h3 class="text-xs font-semibold text-gray-900 dark:text-white sm:text-lg">Complete Payment In</h3>
-            <p class="shadow-slate-4000 rounded-md bg-gray-100 px-2 py-1 text-xs text-secondary shadow-inner dark:bg-gray-700 dark:text-primary dark:shadow-slate-500 sm:text-base" id="countdown" id>
+            <p class="shadow-slate-4000 rounded-md bg-gray-100 px-2 py-1 text-xs text-secondary shadow-inner dark:bg-gray-700 dark:text-primary dark:shadow-slate-500 sm:text-base" id="countdown">
             </p>
         </div>
     </div>
     <!-- Visitor -->
     @foreach ($tickets as $index => $ticket)
         <div class="mt-4 space-y-4 rounded-md bg-gray-50 p-4 shadow-lg dark:bg-gray-800">
-            <h3 class="text-md font-semibold text-gray-900 dark:text-white sm:text-lg">Tiket {{ $index + 1 }} (Pax)</h3>
+            <h3 class="text-md font-semibold text-gray-900 dark:text-white sm:text-lg">Ticket {{ $index + 1 }} (Pax)</h3>
             @if ($index == 0 && count($tickets) > 1)
                 <label class="inline-flex cursor-pointer flex-col items-start sm:flex-row">
                     <input class="peer sr-only" type="checkbox">
@@ -133,29 +133,32 @@ new class extends Component {
         </button>
     </form>
 </div>
-@push('scripts')
+
+@script
     <script>
-        // Set waktu transaksi dibuat
-        var transactionCreatedAt = new Date("{{ $this->transaction->created_at }}");
+        document.addEventListener('livewire:initialized', () => {
+            // Set waktu transaksi dibuat
+            var transactionCreatedAt = new Date("{{ $this->transaction->created_at }}");
 
-        // Hitung waktu akhir transaksi (1 jam setelah transaksi dibuat)
-        var transactionEndTime = new Date(transactionCreatedAt.getTime() + 60 * 60 * 1000);
+            // Hitung waktu akhir transaksi (1 jam setelah transaksi dibuat)
+            var transactionEndTime = new Date(transactionCreatedAt.getTime() + 60 * 60 * 1000);
 
-        // Update hitungan mundur setiap detik
-        var x = setInterval(function() {
-            var now = new Date().getTime();
-            var distance = transactionEndTime - now;
+            // Update hitungan mundur setiap detik
+            var x = setInterval(function() {
+                var now = new Date().getTime();
+                var distance = transactionEndTime - now;
 
-            var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                var seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-            document.getElementById("countdown").innerHTML = hours + "h " + minutes + "m " + seconds + "s ";
+                document.getElementById("countdown").innerHTML = hours + "h " + minutes + "m " + seconds + "s ";
 
-            if (distance < 0) {
-                clearInterval(x);
-                document.getElementById("countdown").innerHTML = "EXPIRED";
-            }
-        }, 1000);
+                if (distance < 0) {
+                    clearInterval(x);
+                    document.getElementById("countdown").innerHTML = "EXPIRED";
+                }
+            }, 1000);
+        })
     </script>
-@endpush
+@endscript

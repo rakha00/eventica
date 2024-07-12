@@ -19,6 +19,7 @@ return new class extends Migration
             $table->unsignedBigInteger('quantity');
             $table->unsignedBigInteger('total_price');
             $table->string('status');
+            $table->string('snap_token')->nullable();
             $table->timestamps();
         });
     }

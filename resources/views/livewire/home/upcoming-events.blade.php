@@ -9,10 +9,10 @@ new class extends Component {
 
     public function mount()
     {
-        $this->events = Event::with('packages')->get();
+        $this->events = Event::with('eventPackages')->get();
         foreach ($this->events as $event) {
             $this->event = $event;
-            $event->lowest_price = $event->packages->min('price');
+            $event->lowest_price = $event->eventPackages->min('price');
         }
     }
 
@@ -21,10 +21,6 @@ new class extends Component {
         $this->redirect(route('event-detail', $slug), navigate: true);
     }
 }; ?>
-
-@push('scripts')
-    @vite(['resources/js/swiper.js'])
-@endpush
 
 <div class="swiper h-max w-full">
     <div class="swiper-wrapper py-4">

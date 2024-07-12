@@ -12,7 +12,7 @@ new class extends Component {
         $this->events = Event::with('packages')->get();
         foreach ($this->events as $event) {
             $this->event = $event;
-            $event->lowest_price = $event->packages->min('price');
+            $event->lowest_price = $event->eventPackages > min('price');
         }
     }
 

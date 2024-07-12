@@ -68,7 +68,7 @@ new class extends Component {
         $this->package->decrement('remaining', $this->quantity);
         $transaction = $this->createTransaction();
         $this->createTicket($transaction);
-        $this->redirect(route('book-contact', ['eventSlug' => $this->package->event->slug, 'packageSlug' => $this->package->slug, 'orderId' => $transaction->order_id]), navigate: true);
+        $this->redirect(route('transaction-contact', ['eventSlug' => $this->package->event->slug, 'packageSlug' => $this->package->slug, 'orderId' => $transaction->order_id]));
     }
 };
 ?>
@@ -180,7 +180,6 @@ new class extends Component {
             </div>
         </div>
     </div>
-    <form wire:submit="bookTicket">
-        <button class="mt-4 w-full rounded-md bg-secondary px-4 py-2 font-bold text-white hover:bg-secondary/80 dark:bg-primary dark:text-gray-900 dark:hover:bg-primary/80">Next</button>
-    </form>
+    <button class="mt-4 w-full rounded-md bg-secondary px-4 py-2 font-bold text-white hover:bg-secondary/80 dark:bg-primary dark:text-gray-900 dark:hover:bg-primary/80"
+        wire:click="bookTicket">Next</button>
 </div>

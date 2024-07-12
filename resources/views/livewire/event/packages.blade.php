@@ -11,7 +11,7 @@ new class extends Component {
 
     public function mount()
     {
-        $this->packages = $this->event->packages()->orderBy('price', 'asc')->get();
+        $this->packages = $this->event->eventPackages()->orderBy('price', 'asc')->get();
 
         $startDate = \Carbon\Carbon::parse($this->event->start_event);
         $endDate = \Carbon\Carbon::parse($this->event->end_event);
@@ -24,7 +24,7 @@ new class extends Component {
 
     public function updatedSelectedDate()
     {
-        $query = $this->event->packages()->orderBy('price', 'asc');
+        $query = $this->event->eventPackages()->orderBy('price', 'asc');
 
         if ($this->selectedDate) {
             $query->whereDate('start_valid', '<=', $this->selectedDate)->whereDate('end_valid', '>=', $this->selectedDate);
@@ -52,7 +52,7 @@ new class extends Component {
             <div class="flex flex-col items-center justify-between gap-2 sm:flex-row">
                 <p class="w-full justify-start text-xl font-bold text-secondary dark:text-primary">{{ 'Rp ' . number_format($package->price, 0, ',', '.') }}</p>
                 <a class="inline-flex w-full items-center justify-center rounded-lg bg-secondary px-3 py-2 text-center font-medium text-white hover:bg-secondary/80 dark:bg-primary dark:text-gray-900 sm:max-w-fit"
-                    href="{{ route('book-detail', [$event->slug, $package->slug]) }}" wire:navigate>
+                    href="{{ route('transaction-detail', [$event->slug, $package->slug]) }}">
                     Select Package
                 </a>
             </div>

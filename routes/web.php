@@ -3,15 +3,18 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\TransactionController;
+use Livewire\Volt\Volt;
 
-Route::get('/', [HomeController::class, 'home'])->name('home');
-Route::get('/event/{eventSlug}', [HomeController::class, 'eventDetail'])->name('event-detail');
+
+Volt::route('/', 'pages.app.index')->name('home');
+Volt::route('/event/{eventSlug}', 'pages.app.event-detail')->name('event-detail');
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/profile', [HomeController::class, 'profile'])->name('profile');
-    Route::get('/book/{eventSlug}/{packageSlug}', [TransactionController::class, 'bookDetail'])->name('book-detail');
-    Route::get('/book/{eventSlug}/{packageSlug}/{orderId}', [TransactionController::class, 'bookContact'])->name('book-contact');
-    Route::get('/payment/{orderId}', [TransactionController::class, 'bookPayment'])->name('book-payment');
+    Volt::route('/profile', 'pages.auth.profile')->name('profile');
+
+    Volt::route('/book/{eventSlug}/{packageSlug}', 'pages.transaction.detail')->name('transaction-detail');
+    Volt::route('/book/{eventSlug}/{packageSlug}/{orderId}', 'pages.transaction.contact')->name('transaction-contact');
+    Volt::route('/payment/{orderId}', 'pages.transaction.payment')->name('trasaction-payment');
 });
 
 require __DIR__ . '/auth.php';

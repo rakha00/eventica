@@ -1,4 +1,11 @@
-<x-app-layout>
+<?php
+
+use function Livewire\Volt\layout;
+
+layout('layouts.app');
+?>
+
+<div>
     <livewire:layout.header />
 
     <div class="mx-auto flex justify-center px-4 py-10">
@@ -7,8 +14,8 @@
                 <h1 class="text-xl font-bold text-gray-900 dark:text-white sm:text-2xl">Complete Payment</h1>
                 <a class="flex items-center text-end text-red-600 hover:text-red-700 dark:text-red-600 dark:hover:text-red-800" href="#">Cancel order</a>
             </div>
-
             <livewire:transaction.payment />
         </div>
     </div>
-</x-app-layout>
+
+</div>

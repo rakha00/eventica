@@ -35,7 +35,6 @@
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
-        @livewireStyles
         @stack('styles')
     </head>
 
@@ -43,7 +42,6 @@
         <div class="min-h-screen bg-gradient-to-r from-blue-200 via-blue-300 to-blue-400 dark:bg-gradient-to-r dark:from-gray-950 dark:via-gray-900 dark:to-gray-800">
             {{ $slot }}
         </div>
-        @livewireScripts
         @stack('scripts')
     </body>
 

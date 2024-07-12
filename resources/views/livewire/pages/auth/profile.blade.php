@@ -1,4 +1,11 @@
-<x-app-layout>
+<?php
+
+use function Livewire\Volt\layout;
+
+layout('layouts.app');
+?>
+
+<div>
     <livewire:layout.header />
 
     <div class="py-12">
@@ -22,4 +29,4 @@
             </div>
         </div>
     </div>
-</x-app-layout>
+</div>

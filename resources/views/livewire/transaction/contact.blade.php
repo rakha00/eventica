@@ -6,7 +6,8 @@ use App\Models\User;
 use Livewire\Volt\Component;
 use Livewire\Attributes\On;
 use Filament\Notifications\Notification;
-use App\Jobs\TransactionExpired;
+use App\Jobs\TransactionExpiredJob;
+use App\Events\TransactionExpiredEvent;
 
 new class extends Component {
     public $transaction;
@@ -18,7 +19,7 @@ new class extends Component {
     {
         $this->transaction = Transaction::where('order_id', request()->route('orderId'))->where('status', 'Pending')->firstOrFail();
 
-        TransactionExpired::dispatch($this->transaction)->delay(now()->addSeconds(20));
+        TransactionExpiredJob::dispatch($this->transaction)->delay(now()->addHours(1));
 
         $tickets = Ticket::where('transaction_id', $this->transaction->id)->get();
         foreach ($tickets as $index => $ticket) {
@@ -32,17 +33,11 @@ new class extends Component {
         }
     }
 
-    public function getListeners()
-    {
-        return [
-            "echo:transaction.{$this->transaction->id},TransactionExpired" => 'redirectTransactionExpired',
-        ];
-    }
-
+    #[On('echo:transaction.20, TransactionExpiredEvent')]
     public function redirectTransactionExpired()
     {
         Notification::make()->title('Transaction expired')->danger()->body('Your transaction has expired.')->send();
-        $this->redirect(route('home'));
+        // $this->redirect(route('home'));
     }
 
     public function updateUser()
@@ -155,18 +150,13 @@ new class extends Component {
 @script
     <script>
         document.addEventListener('livewire:initialized', () => {
-            // Echo.private(`transactions.${transaction.id}`)
-            //     .listen('TransactionExpired', (e) => {
-            //         console.log(e.transaction);
-            //     });
-
-            // Set waktu transaksi dibuat
+            // Set transaction creation time
             var transactionCreatedAt = new Date("{{ $this->transaction->created_at }}");
 
-            // Hitung waktu akhir transaksi (1 jam setelah transaksi dibuat)
+            // Calculate transaction end time (1 hour after transaction creation)
             var transactionEndTime = new Date(transactionCreatedAt.getTime() + 60 * 60 * 1000);
 
-            // Update hitungan mundur setiap detik
+            // Update countdown every second
             var x = setInterval(function() {
                 var now = new Date().getTime();
                 var distance = transactionEndTime - now;
@@ -177,9 +167,20 @@ new class extends Component {
 
                 document.getElementById("countdown").innerHTML = hours + "h " + minutes + "m " + seconds + "s ";
 
+                if (distance < 60000) {
+                    new FilamentNotification()
+                        .title('Transaction expired')
+                        .danger()
+                        .body('Transaction will expired in 1 minute.')
+                        .send()
+                }
+
                 if (distance < 0) {
                     clearInterval(x);
                     document.getElementById("countdown").innerHTML = "EXPIRED";
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 3000);
                 }
             }, 1000);
         })

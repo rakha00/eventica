@@ -2,15 +2,15 @@
 
 namespace App\Jobs;
 
-use App\Events\BroadcastTransactionExpired;
 use App\Models\Transaction;
 use Illuminate\Bus\Queueable;
+use App\Events\TransactionExpiredEvent;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-class TransactionExpired implements ShouldQueue
+class TransactionExpiredJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -23,20 +23,13 @@ class TransactionExpired implements ShouldQueue
     }
 
     /**
-     * The number of seconds the job can run before timing out.
-     *
-     * @var int
-     */
-    public $timeout = 120;
-
-    /**
      * Execute the job.
      */
     public function handle(): void
     {
         if ($this->transaction->status === 'Pending') {
             $this->transaction->update(['status' => 'Expired']);
-            BroadcastTransactionExpired::dispatch($this->transaction);
+            broadcast(new TransactionExpiredEvent($this->transaction));
         }
     }
 }

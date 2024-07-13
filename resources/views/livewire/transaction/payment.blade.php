@@ -68,6 +68,7 @@ new class extends Component {
             'customer_details' => $customer_details,
             'enabled_payments' => $paymentType,
             'expiry' => $expiry,
+            'page_expiry' => $page_expiry,
         ];
 
         try {

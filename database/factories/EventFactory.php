@@ -17,7 +17,7 @@ class EventFactory extends Factory
      */
     public function definition(): array
     {
-        $provinces = json_decode(file_get_contents('https://emsifa.github.io/api-wilayah-indonesia/api/provinces.json'), true);
+        $provinces = json_decode(file_get_contents('https://rakha00.github.io/api-wilayah-indonesia/api/provinces.json'), true);
 
         $provinceOptions = collect($provinces)->mapWithKeys(function ($province) {
             return [$province['name'] => $province['name']];

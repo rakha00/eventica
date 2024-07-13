@@ -4,6 +4,9 @@ use App\Models\Transaction;
 use App\Models\Ticket;
 use App\Models\User;
 use Livewire\Volt\Component;
+use Livewire\Attributes\On;
+use Filament\Notifications\Notification;
+use App\Jobs\TransactionExpired;
 
 new class extends Component {
     public $transaction;
@@ -15,6 +18,8 @@ new class extends Component {
     {
         $this->transaction = Transaction::where('order_id', request()->route('orderId'))->where('status', 'Pending')->firstOrFail();
 
+        TransactionExpired::dispatch($this->transaction)->delay(now()->addSeconds(20));
+
         $tickets = Ticket::where('transaction_id', $this->transaction->id)->get();
         foreach ($tickets as $index => $ticket) {
             $this->tickets[] = [
@@ -25,6 +30,19 @@ new class extends Component {
             ];
             $this->ticketIds[] = $ticket->id;
         }
+    }
+
+    public function getListeners()
+    {
+        return [
+            "echo:transaction.{$this->transaction->id},TransactionExpired" => 'redirectTransactionExpired',
+        ];
+    }
+
+    public function redirectTransactionExpired()
+    {
+        Notification::make()->title('Transaction expired')->danger()->body('Your transaction has expired.')->send();
+        $this->redirect(route('home'));
     }
 
     public function updateUser()
@@ -137,6 +155,11 @@ new class extends Component {
 @script
     <script>
         document.addEventListener('livewire:initialized', () => {
+            // Echo.private(`transactions.${transaction.id}`)
+            //     .listen('TransactionExpired', (e) => {
+            //         console.log(e.transaction);
+            //     });
+
             // Set waktu transaksi dibuat
             var transactionCreatedAt = new Date("{{ $this->transaction->created_at }}");
 

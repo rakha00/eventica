@@ -27,7 +27,7 @@ class TransactionController extends Controller
                     $ticket->status = "Active";
                     $ticket->save();
                 }
-                $transaction->status = "Paid";
+                $transaction->status = "Completed";
                 $transaction->save();
             } else if ($transaction == 'cancel') {
                 if ($fraud == 'challenge') {

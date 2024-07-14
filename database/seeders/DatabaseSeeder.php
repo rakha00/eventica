@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // Seed for Post, Event, Event Category, Event Package, User
         Post::factory(10)->create();
         $categories = EventCategory::factory(5)->create();
         Event::factory(10)->make()->each(function ($event) use ($categories) {

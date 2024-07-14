@@ -74,7 +74,7 @@ new class extends Component {
         $transaction = $this->createTransaction();
         $this->createTicket($transaction);
 
-        TransactionExpiredJob::dispatch($transaction)->delay(now()->addSeconds(60));
+        TransactionExpiredJob::dispatch($transaction)->delay(now()->addMinutes(60));
 
         return redirect()->route('transaction-contact', ['eventSlug' => $this->package->event->slug, 'packageSlug' => $this->package->slug, 'orderId' => $transaction->order_id]);
     }

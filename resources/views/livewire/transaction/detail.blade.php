@@ -4,6 +4,7 @@ use App\Models\EventPackage;
 use App\Models\Transaction;
 use App\Models\Ticket;
 use Filament\Notifications\Notification;
+use App\Jobs\TransactionExpiredJob;
 use Livewire\Volt\Component;
 
 new class extends Component {
@@ -69,12 +70,13 @@ new class extends Component {
             session()->flash('error', 'Sorry, this event package ' . $this->package->remaining . ' tickets left.');
             return;
         }
-
         $this->package->decrement('remaining', $this->quantity);
         $transaction = $this->createTransaction();
         $this->createTicket($transaction);
 
-        $this->redirect(route('transaction-contact', ['eventSlug' => $this->package->event->slug, 'packageSlug' => $this->package->slug, 'orderId' => $transaction->order_id]), navigate: false);
+        return redirect()->route('transaction-contact', ['eventSlug' => $this->package->event->slug, 'packageSlug' => $this->package->slug, 'orderId' => $transaction->order_id]);
+
+        TransactionExpiredJob::dispatch($transaction)->delay(now()->addHours(1));
     }
 };
 ?>
@@ -131,9 +133,8 @@ new class extends Component {
         </div>
     </div>
     @if (session()->has('error'))
-        <div class="mt-4 rounded-md bg-red-600 p-4 text-white dark:bg-red-500" x-data="{ open: true }" x-show="open" x-transition:enter="transition ease-out duration-300"
-            x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100"
-            x-transition:leave-end="opacity-0" x-init="setTimeout(() => { open = false }, 3000)">
+        <div class="mt-4 rounded-md bg-red-600 p-4 text-white dark:bg-red-500" x-data="{ show: true }" x-show="show" x-init="setTimeout(() => { show = false }, 3000)" x-transition:leave="transition ease-in duration-500"
+            x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" wire:poll.5s>
             {{ session('error') }}
         </div>
     @endif

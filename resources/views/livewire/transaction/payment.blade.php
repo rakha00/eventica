@@ -42,8 +42,13 @@ new class extends Component {
         ];
 
         $expiry = [
-            'duration' => 24,
-            'unit' => 'hours',
+            'duration' => floor(60 - $this->transaction->created_at->diffInMinutes(now())),
+            'unit' => 'minutes',
+        ];
+
+        $page_expiry = [
+            'duration' => floor(60 - $this->transaction->created_at->diffInMinutes(now())),
+            'unit' => 'minutes',
         ];
 
         if ($this->paymentType == 'gopay') {
@@ -257,7 +262,7 @@ new class extends Component {
                 },
                 onClose: function() {
                     /* You may add your own implementation here */
-                    alert('you closed the popup without finishing the payment');
+
                 }
             });
         });
@@ -267,15 +272,13 @@ new class extends Component {
 @script
     <script>
         document.addEventListener('livewire:initialized', () => {
-
-
-            // Set waktu transaksi dibuat
+            // Set transaction creation time
             var transactionCreatedAt = new Date("{{ $this->transaction->created_at }}");
 
-            // Hitung waktu akhir transaksi (1 jam setelah transaksi dibuat)
+            // Calculate transaction end time (1 hour after transaction creation)
             var transactionEndTime = new Date(transactionCreatedAt.getTime() + 60 * 60 * 1000);
 
-            // Update hitungan mundur setiap detik
+            // Update countdown every second
             var x = setInterval(function() {
                 var now = new Date().getTime();
                 var distance = transactionEndTime - now;
@@ -287,8 +290,16 @@ new class extends Component {
                 document.getElementById("countdown").innerHTML = hours + "h " + minutes + "m " + seconds + "s ";
 
                 if (distance < 0) {
+                    new FilamentNotification()
+                        .title('Transaction has expired')
+                        .danger()
+                        .body('You will be redirected to the homepage.')
+                        .send();
                     clearInterval(x);
                     document.getElementById("countdown").innerHTML = "EXPIRED";
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 3000);
                 }
             }, 1000);
         })

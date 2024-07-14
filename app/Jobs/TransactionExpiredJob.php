@@ -27,9 +27,8 @@ class TransactionExpiredJob implements ShouldQueue
      */
     public function handle(): void
     {
-        if ($this->transaction->status === 'Pending') {
+        if ($this->transaction->status === 'Pending' || $this->transaction->status === 'On payment') {
             $this->transaction->update(['status' => 'Expired']);
-            broadcast(new TransactionExpiredEvent($this->transaction));
         }
     }
 }

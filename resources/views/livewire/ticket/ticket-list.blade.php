@@ -74,6 +74,9 @@ new class extends Component {
     </x-filament::modal>
 
     <div x-data="{ open: null }">
+        @if ($transactions->isEmpty())
+            <p class="text-lg text-gray-700 dark:text-gray-400">You don't have any tickets</p>
+        @endif
         @foreach ($transactions as $transaction)
             <div>
                 <div class="mb-4">
@@ -115,5 +118,6 @@ new class extends Component {
                 </div>
             </div>
         @endforeach
+
     </div>
 </div>

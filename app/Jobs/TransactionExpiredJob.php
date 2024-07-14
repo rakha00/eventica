@@ -23,6 +23,13 @@ class TransactionExpiredJob implements ShouldQueue
     }
 
     /**
+     * Delete the job if its models no longer exist.
+     *
+     * @var bool
+     */
+    public $deleteWhenMissingModels = true;
+
+    /**
      * Execute the job.
      */
     public function handle(): void

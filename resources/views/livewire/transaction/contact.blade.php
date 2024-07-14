@@ -32,7 +32,7 @@ new class extends Component {
     {
         return [
             'tickets.*.name' => 'required|alpha',
-            'tickets.*.phone' => 'required|max_digits:15|min_digits:7|numeric',
+            'tickets.*.phone' => 'required|max_digits:12|min_digits:10|numeric',
             'tickets.*.email' => 'required|email',
             'tickets.*.identity_card_number' => 'required|digits:16|numeric',
         ];
@@ -42,6 +42,7 @@ new class extends Component {
     {
         return [
             'tickets.*.name.required' => 'Name must be filled.',
+            'tickets.*.name.alpha' => 'Name must be alphabetic.',
             'tickets.*.phone.required' => 'Phone number must be filled.',
             'tickets.*.phone.min_digits' => 'Phone number is too short.',
             'tickets.*.phone.max_digits' => 'Phone number is too long.',
@@ -56,7 +57,6 @@ new class extends Component {
 
     public function updateUser()
     {
-        $this->validate();
         User::where('id', $this->transaction->user_id)->update([
             'phone' => $this->tickets[0]['phone'],
             'identity_card_number' => $this->tickets[0]['identity_card_number'],
@@ -88,6 +88,7 @@ new class extends Component {
 
     public function bookContact()
     {
+        $this->validate();
         $this->updateUser();
         $this->updateTicket();
         $this->updateTransaction();
@@ -140,7 +141,7 @@ new class extends Component {
                     </div>
                     <input
                         class="block w-full rounded-md border-none bg-gray-100 p-2 ps-10 text-gray-900 shadow-inner shadow-slate-400 dark:bg-gray-700 dark:text-white dark:shadow-slate-500 dark:placeholder:text-gray-400"
-                        type="text" wire:model="tickets.{{ $index }}.phone" placeholder="Phone Number" onkeypress="return event.charCode >= 48 && event.charCode <= 57" maxlength="15" />
+                        type="text" wire:model="tickets.{{ $index }}.phone" placeholder="Phone Number" onkeypress="return event.charCode >= 48 && event.charCode <= 57" maxlength="12" />
                 </div>
             </div>
             <div class="mt-4">

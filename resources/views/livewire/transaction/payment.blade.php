@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Transaction;
+use Filament\Notifications\Notification;
 use Livewire\Volt\Component;
 
 new class extends Component {
@@ -81,7 +82,12 @@ new class extends Component {
             $this->updateTransaction();
             $this->dispatch('snapJs', $this->snapToken);
         } catch (\Exception $e) {
-            session()->flash('error', $e->getMessage());
+            if ($e->getCode() === 400) {
+                Notification::make()->title('Oops! Your transaction has been created')->info()->body('You can complete your payment here')->send();
+                redirect()->route('tickets');
+            } else {
+                session()->flash('error', $e->getMessage());
+            }
         }
     }
 
@@ -92,6 +98,20 @@ new class extends Component {
         ]);
     }
 
+    // Handle Snap
+    public function onPending()
+    {
+        Notification::make()->title('Oops! You just close the snap')->info()->body('You can complete your payment here')->send();
+        redirect()->route('tickets');
+    }
+
+    public function onSuccess()
+    {
+        Notification::make()->title('Yeay! Your payment has been successful')->success()->body('You can see your ticket here')->send();
+        redirect()->route('tickets');
+    }
+
+    // Handle Payment
     public function payment()
     {
         if ($this->paymentType == null) {
@@ -120,8 +140,7 @@ new class extends Component {
         </div>
 
         @if (session()->has('error'))
-            <p class="w-fit rounded-full bg-red-500 px-2 py-1 text-xs text-white" x-data="{ show: true }" x-show="show" x-init="setTimeout(() => { show = false }, 3000)" x-transition:leave="transition ease-in duration-500"
-                x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" wire:poll.5s>
+            <p class="w-fit rounded-full bg-red-500 px-2 py-1 text-xs text-white" x-data="{ show: true }" x-show="show" x-init="setTimeout(() => { show = false }, 20000)" wire:poll.20s>
                 {{ session()->get('error') }}
             </p>
         @endif
@@ -245,14 +264,11 @@ new class extends Component {
                 // Optional
                 onSuccess: function(result) {
                     /* You may add your own js here, this is just example */
-                    alert("payment success!");
-                    console.log(result);
+                    $wire.$call('onSuccess');
                 },
                 // Optional
                 onPending: function(result) {
-                    /* You may add your own js here, this is just example */
-                    alert("wating your payment!");
-                    console.log(result);
+                    $wire.$call('onPending');
                 },
                 // Optional
                 onError: function(result) {
@@ -261,7 +277,6 @@ new class extends Component {
                     console.log(result);
                 },
                 onClose: function() {
-                    /* You may add your own implementation here */
 
                 }
             });

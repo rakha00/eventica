@@ -29,14 +29,15 @@ class TransactionController extends Controller
                 }
                 $transaction->status = "Completed";
                 $transaction->save();
+            } else if ($transaction == 'pending') {
+                // TODO Set payment status in merchant's database to 'pending'
+
             } else if ($transaction == 'cancel') {
-                if ($fraud == 'challenge') {
-                    // TODO Set payment status in merchant's database to 'failure'
-                } else if ($fraud == 'accept') {
-                    // TODO Set payment status in merchant's database to 'failure'
-                }
-            } else if ($transaction == 'deny') {
-                // TODO Set payment status in merchant's database to 'failure'
+
+                // TODO Set payment status in merchant's database to 'canceled'
+
+            } else if ($transaction == 'expire') {
+                // TODO Set payment status in merchant's database to 'expired'
             }
         }
     }

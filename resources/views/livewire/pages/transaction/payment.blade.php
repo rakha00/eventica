@@ -31,7 +31,17 @@ new class extends Component implements HasForms, HasActions {
 
     function deleteTransaction()
     {
-        Transaction::where('order_id', $this->orderId)->delete();
+        \Midtrans\Config::$isProduction = config('midtrans.isProduction');
+        \Midtrans\Config::$serverKey = config('midtrans.server_key');
+        $status = \Midtrans\Transaction::status($this->orderId);
+
+        if ($status->transaction_status == 'pending') {
+            $transaction = Transaction::where('order_id', $this->orderId)->first();
+            $transaction->eventPackage->increment('remaining', $transaction->quantity);
+            $transaction->update(['status' => 'Cancelled']);
+        }
+
+        // $transaction->delete();
         return redirect()->route('home');
     }
 };
@@ -46,27 +56,28 @@ new class extends Component implements HasForms, HasActions {
                 <h1 class="text-xl font-bold text-gray-900 dark:text-white sm:text-2xl">Complete Payment</h1>
                 <p class="flex items-center text-end text-red-600 hover:text-red-700 dark:text-red-600 dark:hover:text-red-800" wire:click="openModal">Cancel order</p>
             </div>
-            <x-filament::modal id="delete-transaction" icon="heroicon-o-trash" icon-color="danger" alignment="center" :close-by-clicking-away="false" :close-button="false">
-                <x-slot name="heading">
-                    Cancel Order
-                </x-slot>
-
-                <x-slot name="description">
-                    Are you sure wanna cancel this order?
-                </x-slot>
-                {{-- Modal content --}}
-                <div class="flex justify-center gap-2">
-                    {{-- Modal footer actions --}}
-                    <x-filament::button wire:click="closeModal" color="gray">
-                        Close
-                    </x-filament::button>
-                    <x-filament::button wire:click="deleteTransaction" color="danger">
-                        Confirm
-                    </x-filament::button>
-                </div>
-            </x-filament::modal>
             <livewire:transaction.payment />
         </div>
     </div>
+
+    <x-filament::modal id="delete-transaction" icon="heroicon-o-trash" icon-color="danger" alignment="center" :close-by-clicking-away="false" :close-button="false">
+        <x-slot name="heading">
+            Cancel Order
+        </x-slot>
+
+        <x-slot name="description">
+            Are you sure wanna cancel this order?
+        </x-slot>
+        {{-- Modal content --}}
+        <div class="flex justify-center gap-2">
+            {{-- Modal footer actions --}}
+            <x-filament::button wire:click="closeModal" color="gray">
+                Close
+            </x-filament::button>
+            <x-filament::button wire:click="deleteTransaction" color="danger">
+                Confirm
+            </x-filament::button>
+        </div>
+    </x-filament::modal>
 
 </div>

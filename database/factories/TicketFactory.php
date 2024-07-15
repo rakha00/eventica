@@ -23,7 +23,7 @@ class TicketFactory extends Factory
             'email' => fake()->email(),
             'phone' => '08' . mt_rand(100000000, 999999999),
             'identity_card_number' => mt_rand(1000000000000, 9999999999999),
-            'status' => 'Inactive',
+            'status' => 'Pending',
         ];
     }
 }

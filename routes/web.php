@@ -14,7 +14,7 @@ Route::middleware(['auth'])->group(function () {
 
     Volt::route('/book/{eventSlug}/{packageSlug}', 'pages.transaction.detail')->name('transaction-detail');
     Volt::route('/book/{eventSlug}/{packageSlug}/{orderId}', 'pages.transaction.contact')->name('transaction-contact');
-    Volt::route('/payment/{orderId}', 'pages.transaction.payment')->name('trasaction-payment');
+    Volt::route('/payment/{orderId}', 'pages.transaction.payment')->name('transaction-payment');
 });
 
 require __DIR__ . '/auth.php';

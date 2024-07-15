@@ -92,7 +92,7 @@ new class extends Component {
         $this->updateUser();
         $this->updateTicket();
         $this->updateTransaction();
-        $this->redirect(route('trasaction-payment', ['orderId' => $this->transaction->order_id]));
+        return redirect()->route('transaction-payment', ['orderId' => $this->transaction->order_id]);
     }
 };
 ?>

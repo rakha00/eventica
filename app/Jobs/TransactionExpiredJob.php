@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Models\Transaction;
 use Illuminate\Bus\Queueable;
 use App\Events\TransactionExpiredEvent;
+use App\Models\Ticket;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
@@ -35,6 +36,8 @@ class TransactionExpiredJob implements ShouldQueue
     public function handle(): void
     {
         if ($this->transaction->status === 'Pending' || $this->transaction->status === 'On payment') {
+            Ticket::where('transaction_id', $this->transaction->id)->delete();
+            $this->transaction->eventPackage->increment('remaining', $this->transaction->quantity);
             $this->transaction->update(['status' => 'Expired']);
         }
     }

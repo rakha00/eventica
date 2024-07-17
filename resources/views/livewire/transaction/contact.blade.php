@@ -97,6 +97,16 @@ new class extends Component {
 };
 ?>
 
+@script
+    <script>
+        $wire.on('redirect', () => {
+            setTimeout(function() {
+                window.location.href = '/tickets';
+            }, 2000);
+        });
+    </script>
+@endscript
+
 <div class="p-6">
     <h2 class="mb-2 text-2xl font-semibold text-gray-900 dark:text-white">Visitor Details</h2>
     <p class="text-xs text-gray-500 dark:text-gray-300">Make sure to fill in the visitor details correctly for a smooth
@@ -114,7 +124,7 @@ new class extends Component {
         <div class="mt-4 rounded-md bg-gray-50 p-4 shadow-lg dark:bg-gray-800">
             <h3 class="text-md font-semibold text-gray-900 dark:text-white sm:text-lg">Ticket {{ $index + 1 }} (Pax)</h3>
             @if ($index == 0 && count($tickets) > 1)
-                <label class="inline-flex cursor-pointer flex-col items-start sm:flex-row">
+                <label class="mt-4 inline-flex cursor-pointer flex-col items-start sm:flex-row">
                     <input class="peer sr-only" type="checkbox">
                     <div class="peer relative mb-2 me-2 h-6 w-11 rounded-full border-gray-600 bg-gray-100 shadow-inner shadow-slate-400 after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-secondary/80 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-0 peer-focus:ring-secondary rtl:peer-checked:after:-translate-x-full dark:bg-gray-700 dark:shadow-slate-500 dark:peer-checked:bg-primary/80 dark:peer-focus:ring-primary"
                         wire:click="fillAllInformation">

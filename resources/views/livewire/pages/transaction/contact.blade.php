@@ -14,22 +14,22 @@ new class extends Component implements HasForms, HasActions {
     public $orderId;
 
     #[Layout('layouts.app')]
-    function mount()
+    public function mount()
     {
         $this->orderId = request()->route('orderId');
     }
 
-    function openModal()
+    public function openModal()
     {
         $this->dispatch('open-modal', id: 'delete-transaction');
     }
 
-    function closeModal()
+    public function closeModal()
     {
         $this->dispatch('close-modal', id: 'delete-transaction');
     }
 
-    function deleteTransaction()
+    public function deleteTransaction()
     {
         $transaction = Transaction::where('order_id', $this->orderId)->first();
         $transaction->eventPackage->increment('remaining', $transaction->quantity);

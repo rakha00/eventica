@@ -33,11 +33,10 @@ class TransactionController extends Controller
                 // TODO Set payment status in merchant's database to 'pending'
 
             } else if ($transaction == 'cancel') {
-
                 // TODO Set payment status in merchant's database to 'canceled'
 
             } else if ($transaction == 'expire') {
-                // TODO Set payment status in merchant's database to 'expired'
+                // This condition already handled by Jobs
             }
         }
     }

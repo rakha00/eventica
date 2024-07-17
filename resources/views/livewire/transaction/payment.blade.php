@@ -102,13 +102,13 @@ new class extends Component {
     public function onPending()
     {
         Notification::make()->title('Oops! You just close the snap')->info()->body('You can complete your payment here')->send();
-        redirect()->route('tickets');
+        return redirect()->route('tickets');
     }
 
     public function onSuccess()
     {
         Notification::make()->title('Yeay! Your payment has been successful')->success()->body('You can see your ticket here')->send();
-        redirect()->route('tickets');
+        return redirect()->route('tickets');
     }
 
     // Handle Payment
@@ -200,7 +200,7 @@ new class extends Component {
                 </h3>
             </div>
             <div class="mb-4 flex items-center">
-                <img class="h-16 w-16 rounded-md" src="{{ $this->transaction->eventPackage->event->image }}" alt="Event Image">
+                <img class="h-16 w-16 rounded-md" src="{{ $this->transaction->eventPackage->event->image }}" alt="Event">
                 <div class="ml-4">
                     <h4 class="text-sm font-semibold text-gray-900 dark:text-gray-50">
                         {{ $this->transaction->eventPackage->event->title }}

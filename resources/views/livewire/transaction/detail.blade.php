@@ -14,7 +14,17 @@ new class extends Component {
 
     public function mount()
     {
-        $this->package = EventPackage::where('slug', request()->packageSlug)->firstOrFail();
+        $this->package = EventPackage::where('slug', request()->route('packageSlug'))->firstOrFail();
+
+        // Handle redirect failed (Fix Soon)
+        $existingTransaction = Transaction::where('user_id', auth()->user()->id)
+            ->where('event_package_id', $this->package->id)
+            ->first();
+
+        if ($existingTransaction) {
+            Notification::make()->title('Whoops! sorry something went wrong')->warning()->body('Please continue you transaction here.')->send();
+            $this->dispatch('redirect');
+        }
 
         $this->totalPrice = $this->package->price;
     }
@@ -47,7 +57,7 @@ new class extends Component {
         ]);
 
         //Send notification to user
-        Notification::make()->title('Transaction created successfully')->success()->body('You have 60 minutes to complete the payment.')->send();
+        Notification::make()->title('Ticket order has been created')->success()->body('You have 60 minutes to complete the payment.')->send();
 
         return $transaction;
     }
@@ -67,8 +77,7 @@ new class extends Component {
     public function bookTicket()
     {
         if ($this->package->remaining < $this->quantity) {
-            session()->flash('error', 'Sorry, this event package ' . $this->package->remaining . ' tickets left.');
-            return;
+            return session()->flash('error', 'Sorry, this event package ' . $this->package->remaining . ' tickets left.');
         }
         $this->package->decrement('remaining', $this->quantity);
         $transaction = $this->createTransaction();
@@ -122,7 +131,7 @@ new class extends Component {
                 <button class="rounded-lg bg-slate-50 px-2 text-gray-900 shadow-lg hover:bg-gray-200 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500" wire:click="increment">+</button>
             </div>
         </div>
-        <div class="mt-4 border-b-2 border-dashed"></div>
+        <div class="mt-4 border-b-2 border-dashed border-gray-900 dark:border-white"></div>
     </div>
     <div class="mt-4 rounded-md bg-gray-50 p-4 shadow-lg dark:bg-gray-800""> <!-- Discount -->
         <h3 class="mb-2 font-semibold text-gray-900 dark:text-white sm:text-lg">Promo</h3>
@@ -217,3 +226,13 @@ new class extends Component {
     <button class="mt-4 w-full rounded-md bg-secondary px-4 py-2 font-bold text-white hover:bg-secondary/80 dark:bg-primary dark:text-gray-900 dark:hover:bg-primary/80"
         wire:click="bookTicket">Next</button>
 </div>
+
+@script
+    <script>
+        $wire.on('redirect', () => {
+            setTimeout(function() {
+                window.location.href = '/tickets';
+            }, 2000);
+        });
+    </script>
+@endscript

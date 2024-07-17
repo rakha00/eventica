@@ -14,28 +14,58 @@ new class extends Component {
 
     public function mount()
     {
-        $this->transactions = Transaction::with(['tickets', 'eventPackage', 'eventPackage.event'])
+        $this->transactions = Transaction::with(['tickets', 'eventPackage.event'])
             ->where('user_id', auth()->id())
+            ->where('status', 'Completed')
             ->orderBy('created_at', 'desc')
             ->get();
     }
 
     public function allTickets()
     {
-        $this->transactions = Transaction::with(['tickets', 'eventPackage', 'eventPackage.event'])
+        $this->transactions = Transaction::with(['tickets', 'eventPackage.event'])
             ->where('user_id', auth()->id())
+            ->where('status', 'Completed')
             ->orderBy('created_at', 'desc')
             ->get();
     }
 
     public function upcomingEvents()
     {
-        $this->transactions = Transaction::with('tickets')->where('user_id', Auth::id())->where('status', 'Completed')->orderBy('created_at', 'desc')->get();
+        $this->transactions = Transaction::with([
+            'tickets',
+            'eventPackage' => function ($query) {
+                $query->whereDate('end_valid', '>', now());
+            },
+            'eventPackage.event',
+        ])
+            ->where('user_id', auth()->id())
+            ->where('status', 'Completed')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $this->transactions = $this->transactions->filter(function ($transaction) {
+            return $transaction->eventPackage !== null;
+        });
     }
 
     public function pastEvents()
     {
-        $this->transactions = Transaction::with('tickets')->where('user_id', Auth::id())->where('status', 'Completed')->orderBy('created_at', 'desc')->get();
+        $this->transactions = Transaction::with([
+            'tickets',
+            'eventPackage' => function ($query) {
+                $query->whereDate('end_valid', '<', now());
+            },
+            'eventPackage.event',
+        ])
+            ->where('user_id', auth()->id())
+            ->where('status', 'Completed')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $this->transactions = $this->transactions->filter(function ($transaction) {
+            return $transaction->eventPackage !== null;
+        });
     }
 
     public function viewQRCode($ticketId)
@@ -50,27 +80,28 @@ new class extends Component {
     <div class="flex space-x-4" x-data="{ activeTab: 'allTickets' }">
         <button class="rounded-full bg-white px-2 py-1 text-xs shadow dark:bg-gray-700"
             :class="{ 'bg-secondary text-white dark:bg-primary dark:text-gray-900': activeTab === 'allTickets', 'bg-white text-gray-900 dark:text-white': activeTab !== 'allTickets' }"
-            x-on:click="activeTab = 'allTickets'; $wire.allTickets()">
+            x-on:click="activeTab = 'allTickets'" wire:click="allTickets">
             All Tickets
         </button>
         <button class="rounded-full bg-white px-2 py-1 text-xs shadow dark:bg-gray-700 dark:text-white"
-            :class="{ 'bg-secondary text-white dark:bg-primary dark:text-gray-900': activeTab === 'upcomingEvents', 'bg-white text-gray-900 dark:text-white': activeTab !== 'upcomingEvents' }"
-            x-on:click="activeTab = 'upcomingEvents'; $wire.upcomingEvents()">
+            :class="{ 'bg-secondary text-white dark:bg-primary dark:text-gray-900': activeTab === 'upcomingEvents', 'bg-white text-gray-9000 dark:text-white': activeTab !== 'upcomingEvents' }"
+            x-on:click="activeTab = 'upcomingEvents'" wire:click="upcomingEvents">
             Upcoming Events
         </button>
         <button class="rounded-full bg-white px-2 py-1 text-xs shadow dark:bg-gray-700 dark:text-white"
             :class="{ 'bg-secondary text-white dark:bg-primary dark:text-gray-900': activeTab === 'pastEvents', 'bg-white text-gray-9000 dark:text-white': activeTab !== 'pastEvents' }"
-            x-on:click="activeTab = 'pastEvents'; $wire.pastEvents()">
+            x-on:click="activeTab = 'pastEvents'" wire:click="pastEvents">
             Past Events
         </button>
     </div>
 
     <x-filament::modal id="view-qr-code" alignment="center">
         <x-slot name="heading">
-            Ticket ID: {{ $ticketId }}
+            Scan this QR code at venue
         </x-slot>
         {{-- Modal content --}}
         <img class="w-full" src="{{ $qrCode }}" alt="QR Code">
+        <p>{{ 'Ticket ID: ' . $ticketId }}</p>
     </x-filament::modal>
 
     <div x-data="{ open: null }">
@@ -78,18 +109,19 @@ new class extends Component {
             <p class="text-lg text-gray-700 dark:text-gray-400">You don't have any tickets</p>
         @endif
         @foreach ($transactions as $transaction)
-            <div>
+            <div wire:key="{{ $transaction->id }}">
                 <div class="mb-4">
                     <button
                         class="flex w-full items-center justify-between rounded-lg border border-gray-200 bg-white p-4 shadow hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700"
                         x-on:click="open === {{ $transaction->id }} ? open = null : open = {{ $transaction->id }}">
                         <div class="flex items-center">
-                            <img class="h-12 w-12 rounded-full object-cover" src="{{ $transaction->eventPackage->event->image }}" alt="Event Image">
+                            <img class="h-12 w-12 rounded-full object-cover" src="{{ $transaction->eventPackage->event->image }}" alt="Event">
                             <div class="ml-4 text-left">
                                 <h5 class="text-lg font-bold text-gray-900 dark:text-white">{{ $transaction->eventPackage->event->title }}
                                     ({{ $transaction->eventPackage->title }})
                                 </h5>
-                                <p class="text-sm text-gray-700 dark:text-gray-400">{{ \Carbon\Carbon::parse($transaction->eventPackage->start_valid)->format('d F Y H:i') }}</p>
+                                <p class="text-sm text-gray-700 dark:text-gray-400">{{ \Carbon\Carbon::parse($transaction->eventPackage->start_valid)->format('d F Y H:i') }} -
+                                    {{ \Carbon\Carbon::parse($transaction->eventPackage->end_valid)->format('d F Y H:i') }}</p>
                             </div>
                         </div>
                         <svg class="h-6 w-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -98,7 +130,7 @@ new class extends Component {
                     </button>
                     <div class="mt-2 grid grid-cols-1 gap-2 md:grid-cols-2" x-show="open === {{ $transaction->id }}">
                         @foreach ($transaction->tickets as $ticket)
-                            <div>
+                            <div wire:key="{{ $ticket->id }}">
                                 <a
                                     class="flex flex-col items-center rounded-lg border border-gray-200 bg-white shadow hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700 md:max-w-xl md:flex-row">
                                     <div class="flex w-full flex-col justify-between p-4 leading-normal lg:flex-row lg:items-center lg:justify-between">
@@ -118,6 +150,5 @@ new class extends Component {
                 </div>
             </div>
         @endforeach
-
     </div>
 </div>

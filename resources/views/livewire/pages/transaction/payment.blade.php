@@ -14,22 +14,22 @@ new class extends Component implements HasForms, HasActions {
     public $orderId;
 
     #[Layout('layouts.app')]
-    function mount()
+    public function mount()
     {
         $this->orderId = request()->route('orderId');
     }
 
-    function openModal()
+    public function openModal()
     {
         $this->dispatch('open-modal', id: 'delete-transaction');
     }
 
-    function closeModal()
+    public function closeModal()
     {
         $this->dispatch('close-modal', id: 'delete-transaction');
     }
 
-    function deleteTransaction()
+    public function deleteTransaction()
     {
         \Midtrans\Config::$isProduction = config('midtrans.isProduction');
         \Midtrans\Config::$serverKey = config('midtrans.server_key');
@@ -41,7 +41,7 @@ new class extends Component implements HasForms, HasActions {
             $transaction->update(['status' => 'Cancelled']);
         }
 
-        // $transaction->delete();
+        $transaction->delete();
         return redirect()->route('home');
     }
 };

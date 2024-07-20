@@ -18,7 +18,7 @@ $logout = function (Logout $logout) {
             <button class="flex rounded-full bg-gray-800 text-sm focus:ring-4 focus:ring-secondary dark:focus:ring-primary/90 md:me-0" id="user-menu-button" data-dropdown-toggle="user-dropdown"
                 data-dropdown-placement="bottom" type="button" aria-expanded="false">
                 <span class="sr-only">Open user menu</span>
-                <img class="h-8 w-8 rounded-full" src="{{ asset('storage/profile/default.webp') }}" alt="User Photo">
+                <img class="h-8 w-8 rounded-full" src="{{ asset('storage/profile/default.webp') }}" alt="User">
             </button>
             <!-- Dropdown menu -->
             <div class="z-50 my-4 hidden list-none divide-y divide-gray-100 rounded-lg bg-white text-base shadow dark:divide-gray-600 dark:bg-gray-700" id="user-dropdown">
@@ -82,19 +82,11 @@ $logout = function (Logout $logout) {
                 </li>
                 <li>
                     <a class="block rounded px-3 py-2 text-gray-900 hover:bg-gray-100 dark:border-gray-700 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:p-0 md:hover:bg-transparent md:hover:text-secondary md:dark:hover:bg-transparent md:dark:hover:text-primary"
-                        href="#">About</a>
+                        href="#">All Events</a>
                 </li>
                 <li>
                     <a class="block rounded px-3 py-2 text-gray-900 hover:bg-gray-100 dark:border-gray-700 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:p-0 md:hover:bg-transparent md:hover:text-secondary md:dark:hover:bg-transparent md:dark:hover:text-primary"
-                        href="#">Services</a>
-                </li>
-                <li>
-                    <a class="block rounded px-3 py-2 text-gray-900 hover:bg-gray-100 dark:border-gray-700 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:p-0 md:hover:bg-transparent md:hover:text-secondary md:dark:hover:bg-transparent md:dark:hover:text-primary"
-                        href="#">Pricing</a>
-                </li>
-                <li>
-                    <a class="block rounded px-3 py-2 text-gray-900 hover:bg-gray-100 dark:border-gray-700 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:p-0 md:hover:bg-transparent md:hover:text-secondary md:dark:hover:bg-transparent md:dark:hover:text-primary"
-                        href="#">Contact</a>
+                        href="#">About Us</a>
                 </li>
             </ul>
         </div>

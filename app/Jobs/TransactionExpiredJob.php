@@ -35,7 +35,7 @@ class TransactionExpiredJob implements ShouldQueue
      */
     public function handle(): void
     {
-        if ($this->transaction->status === 'Pending' || $this->transaction->status === 'On payment') {
+        if (in_array($this->transaction->status, ['Pending', 'On payment'])) {
             Ticket::where('transaction_id', $this->transaction->id)->delete();
             $this->transaction->eventPackage->increment('remaining', $this->transaction->quantity);
             $this->transaction->update(['status' => 'Expired']);

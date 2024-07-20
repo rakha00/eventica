@@ -10,33 +10,29 @@ class TransactionController extends Controller
 {
     public function midtransNotification()
     {
-        \Midtrans\Config::$isProduction = false;
+        \Midtrans\Config::$isProduction = config('midtrans.is_production');
         \Midtrans\Config::$serverKey = config('midtrans.server_key');
         $notif = new \Midtrans\Notification();
 
-        $transaction = $notif->transaction_status;
-        $fraud = $notif->fraud_status;
+        $transactionStatus = $notif->transaction_status;
+        $verifySignatureKey = hash('sha512', $notif->order_id . $notif->status_code . $notif->gross_amount . config('midtrans.server_key'));
 
-        $verify_signature_key = hash('sha512', $notif->order_id . $notif->status_code . $notif->gross_amount . config('midtrans.server_key'));
-
-        if ($verify_signature_key == $notif->signature_key) {
-            if ($transaction == 'settlement') {
-                $transaction = Transaction::where('order_id', $notif->order_id)->firstOrFail();
-                $ticket = Ticket::where('transaction_id', $transaction->id)->get();
-                foreach ($ticket as $ticket) {
+        if ($verifySignatureKey === $notif->signature_key) {
+            $transaction = Transaction::where('order_id', $notif->order_id)->firstOrFail();
+            if ($transactionStatus === 'settlement') {
+                $tickets = Ticket::where('transaction_id', $transaction->id)->get();
+                foreach ($tickets as $ticket) {
                     $ticket->status = "Active";
                     $ticket->save();
                 }
                 $transaction->status = "Completed";
                 $transaction->save();
-            } else if ($transaction == 'pending') {
+            } elseif ($transactionStatus === 'pending') {
                 // TODO Set payment status in merchant's database to 'pending'
-
-            } else if ($transaction == 'cancel') {
+            } elseif ($transactionStatus === 'cancel') {
                 // TODO Set payment status in merchant's database to 'canceled'
-
-            } else if ($transaction == 'expire') {
-                // This condition already handled by Jobs
+            } elseif ($transactionStatus === 'expire') {
+                // TODO Set payment status in merchant's database to 'expire'
             }
         }
     }

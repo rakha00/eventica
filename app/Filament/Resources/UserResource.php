@@ -34,7 +34,8 @@ class UserResource extends Resource
                 Forms\Components\TextInput::make('password')
                     ->password()
                     ->required()
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->readonly(),
                 Forms\Components\Select::make('role')
                     ->required()
                     ->options([
@@ -52,6 +53,10 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('phone')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('identity_card_number')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email_verified_at')
                     ->dateTime()
@@ -71,7 +76,12 @@ class UserResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('role')
+                    ->options([
+                        'user' => 'User',
+                        'admin' => 'Admin',
+                    ])
+                    ->label('Role'),
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([

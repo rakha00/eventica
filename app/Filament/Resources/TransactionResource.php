@@ -24,39 +24,23 @@ class TransactionResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
-            ->schema([
-                Forms\Components\TextInput::make('user_id')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('event_package_id')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('order_id')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('quantity')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('total_price')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('status')
-                    ->required()
-                    ->maxLength(255),
-            ]);
+            ->schema([]);
     }
 
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('user_id')
+                Tables\Columns\TextColumn::make('id')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('event_package_id')
+                Tables\Columns\TextColumn::make('user.name')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('eventPackage.title')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('order_id')
+                    ->label('Order ID')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('quantity')
                     ->numeric()
@@ -65,7 +49,15 @@ class TransactionResource extends Resource
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status')
-                    ->searchable(),
+                    ->badge()
+                    ->searchable()
+                    ->color(fn (string $state): string => match ($state) {
+                        'Completed' => 'success',
+                        'Pending' => 'warning',
+                        'On payment' => 'warning',
+                        'Expired' => 'danger',
+                        'Canceled' => 'danger',
+                    }),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -78,15 +70,8 @@ class TransactionResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
-            ]);
+            ->actions([])
+            ->bulkActions([]);
     }
 
     public static function getPages(): array

@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\EventResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\EventResource\RelationManagers;
-use Filament\Forms\Components\Select;
+use Filament\Notifications\Notification;
 
 class EventResource extends Resource
 {
@@ -30,11 +30,6 @@ class EventResource extends Resource
 
     public static function form(Form $form): Form
     {
-        $provinces = json_decode(file_get_contents('https://emsifa.github.io/api-wilayah-indonesia/api/provinces.json'), true);
-
-        $provinceOptions = collect($provinces)->mapWithKeys(function ($province) {
-            return [$province['name'] => $province['name']];
-        });
 
         return $form
             ->schema([
@@ -53,9 +48,9 @@ class EventResource extends Resource
                 Forms\Components\DateTimePicker::make('end_event')
                     ->required()
                     ->minDate(fn (Get $get) => $get('start_event')),
-                Forms\Components\Select::make('location')
+                Forms\Components\TextInput::make('location')
                     ->required()
-                    ->options($provinceOptions),
+                    ->maxLength(50),
                 Forms\Components\FileUpload::make('image')
                     ->image()
                     ->required()
@@ -75,7 +70,7 @@ class EventResource extends Resource
                     ])
                     ->default('unpublished')
                     ->disableOptionWhen(function (string $value, ?Event $record): bool {
-                        if ($record) {
+                        if ($record && $record->eventPackages()->exists()) {
                             return false;
                         }
                         return $value === 'published';
@@ -94,6 +89,7 @@ class EventResource extends Resource
             ->columns([
                 Tables\Columns\ImageColumn::make('image'),
                 Tables\Columns\TextColumn::make('eventCategory.title')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('title')
                     ->description(fn (Event $record): string => strip_tags(Str::limit($record->description, 20)))
@@ -105,7 +101,14 @@ class EventResource extends Resource
                 Tables\Columns\TextColumn::make('end_event')
                     ->dateTime('M j, Y')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('location'),
+                Tables\Columns\TextColumn::make('location')
+                    ->limit(10),
+                Tables\Columns\TextColumn::make('capacity')
+                    ->label('Capacity')
+                    ->getStateUsing(fn (Event $record): int => $record->eventPackages()->sum('capacity')),
+                Tables\Columns\TextColumn::make('sold')
+                    ->label('Sold')
+                    ->getStateUsing(fn (Event $record): int => $record->eventPackages()->sum('capacity') - $record->eventPackages()->sum('remaining')),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
@@ -163,6 +166,19 @@ class EventResource extends Resource
                         ->color('info')
                         ->icon('heroicon-s-arrow-uturn-right')
                         ->url(fn (Event $record): string => url('admin/event-packages?tableFilters[event_id][value]=' . $record->id)),
+                    Tables\Actions\Action::make('toggle_publish')
+                        ->label(fn (Event $record): string => $record->status === 'published' ? 'Unpublish' : 'Publish')
+                        ->color(fn (Event $record): string => $record->status === 'published' ? 'danger' : 'success')
+                        ->icon('heroicon-o-globe-alt')
+                        ->action(function (Event $record) {
+                            if ($record->eventPackages()->exists()) {
+                                $newStatus = $record->status === 'published' ? 'unpublished' : 'published';
+                                $record->update(['status' => $newStatus]);
+                            } else {
+                                Notification::make()->title('Event cannot be published without package')->warning()->send();
+                            }
+                        })
+                        ->requiresConfirmation(),
                     Tables\Actions\EditAction::make()
                         ->color('warning'),
                     Tables\Actions\DeleteAction::make(),

@@ -14,7 +14,14 @@ new class extends Component {
 
     public function mount()
     {
-        $this->transaction = Transaction::where('order_id', request()->route('orderId'))->where('status', 'Pending')->firstOrFail();
+        $this->transaction = Transaction::where('order_id', request()->route('orderId'))
+            ->where('user_id', auth()->user()->id)
+            ->first();
+
+        // Handle redirect failed
+        if ($this->transaction->status === 'On payment') {
+            $this->dispatch('redirect', $this->transaction->order_id);
+        }
 
         $tickets = Ticket::where('transaction_id', $this->transaction->id)->get();
         foreach ($tickets as $index => $ticket) {
@@ -99,10 +106,8 @@ new class extends Component {
 
 @script
     <script>
-        $wire.on('redirect', () => {
-            setTimeout(function() {
-                window.location.href = '/tickets';
-            }, 2000);
+        $wire.on('redirect', (orderId) => {
+            window.location.href = '/payment/' + orderId;
         });
     </script>
 @endscript
@@ -115,7 +120,7 @@ new class extends Component {
     <div class="mt-4 rounded-md bg-gray-50 p-4 shadow-lg dark:bg-gray-800" wire:ignore>
         <div class="inline-flex w-full items-center justify-between">
             <h3 class="text-xs font-semibold text-gray-900 dark:text-white sm:text-lg">Complete Payment In</h3>
-            <p class="shadow-slate-4000 rounded-md bg-gray-100 px-2 py-1 text-xs text-secondary shadow-inner dark:bg-gray-700 dark:text-primary dark:shadow-slate-500 sm:text-base" id="countdown">
+            <p class="shadow-slate-4000 rounded-md bg-gray-100 px-2 py-1 text-xs text-primary shadow-inner dark:bg-gray-700 dark:text-secondary dark:shadow-slate-500 sm:text-base" id="countdown">
             </p>
         </div>
     </div>
@@ -126,7 +131,7 @@ new class extends Component {
             @if ($index == 0 && count($tickets) > 1)
                 <label class="mt-4 inline-flex cursor-pointer flex-col items-start sm:flex-row">
                     <input class="peer sr-only" type="checkbox">
-                    <div class="peer relative mb-2 me-2 h-6 w-11 rounded-full border-gray-600 bg-gray-100 shadow-inner shadow-slate-400 after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-secondary/80 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-0 peer-focus:ring-secondary rtl:peer-checked:after:-translate-x-full dark:bg-gray-700 dark:shadow-slate-500 dark:peer-checked:bg-primary/80 dark:peer-focus:ring-primary"
+                    <div class="peer relative mb-2 me-2 h-6 w-11 rounded-full border-gray-600 bg-gray-100 shadow-inner shadow-slate-400 after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-primary/80 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-0 peer-focus:ring-primary rtl:peer-checked:after:-translate-x-full dark:bg-gray-700 dark:shadow-slate-500 dark:peer-checked:bg-secondary/80 dark:peer-focus:ring-secondary"
                         wire:click="fillAllInformation">
                     </div>
                     <span class="text-xs font-medium text-gray-900 dark:text-white sm:text-base">Fill all information with the
@@ -178,13 +183,13 @@ new class extends Component {
         <!-- Total Payment -->
         <div class="mb-2 inline-flex w-full justify-between border-b-2 border-dashed border-gray-900 dark:border-gray-50">
             <h3 class="text-md mb-2 font-semibold text-gray-900 dark:text-white sm:text-lg">Total Payment</h3>
-            <p class="text-md font-bold text-secondary dark:text-primary">
+            <p class="text-md font-bold text-primary dark:text-secondary">
                 {{ 'Rp ' . number_format($transaction->total_price, 0, ',', '.') }}
             </p>
         </div>
     </div>
     <form wire:submit="bookContact">
-        <button class="mt-4 w-full rounded-md bg-secondary px-4 py-2 font-bold text-white hover:bg-secondary/80 dark:bg-primary dark:text-black dark:hover:bg-primary/80">
+        <button class="mt-4 w-full rounded-md bg-primary px-4 py-2 font-bold text-white hover:bg-primary/80 dark:bg-secondary dark:text-black dark:hover:bg-secondary/80">
             Next
         </button>
     </form>

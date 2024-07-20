@@ -1,10 +1,10 @@
 <?php
 
-use App\Models\EventPackage;
-use App\Models\Transaction;
 use App\Models\Ticket;
-use Filament\Notifications\Notification;
+use App\Models\Transaction;
+use App\Models\EventPackage;
 use App\Jobs\TransactionExpiredJob;
+use Filament\Notifications\Notification;
 use Livewire\Volt\Component;
 
 new class extends Component {
@@ -16,14 +16,13 @@ new class extends Component {
     {
         $this->package = EventPackage::where('slug', request()->route('packageSlug'))->firstOrFail();
 
-        // Handle redirect failed (Fix Soon)
+        // Handle redirect failed
         $existingTransaction = Transaction::where('user_id', auth()->user()->id)
             ->where('event_package_id', $this->package->id)
             ->first();
 
         if ($existingTransaction) {
-            Notification::make()->title('Whoops! sorry something went wrong')->warning()->body('Please continue you transaction here.')->send();
-            $this->dispatch('redirect');
+            $this->dispatch('redirect', $this->package->event->slug, $this->package->slug, $existingTransaction->order_id);
         }
 
         $this->totalPrice = $this->package->price;
@@ -95,7 +94,7 @@ new class extends Component {
     <div class="mt-4 rounded-md bg-gray-50 p-4 shadow-lg dark:bg-gray-800">
         <!-- Package -->
         <h3 class="mb-2 font-semibold text-gray-900 dark:text-white sm:text-lg">{{ $package->title }}</h3>
-        <p class="border-b-2 border-dashed border-gray-900 pb-2 font-bold text-secondary dark:border-gray-50 dark:text-primary sm:text-lg">
+        <p class="border-b-2 border-dashed border-gray-900 pb-2 font-bold text-primary dark:border-gray-50 dark:text-secondary sm:text-lg">
             {{ 'Rp ' . number_format($package->price, 0, ',', '.') }}
         </p>
     </div>
@@ -103,7 +102,7 @@ new class extends Component {
         <h3 class="mb-2 font-semibold text-gray-900 dark:text-white sm:text-lg">Date</h3>
         <div class="flex items-center justify-between gap-2 border-b-2 border-dashed border-gray-900 pb-4 dark:border-gray-50">
             <div class="w-full">
-                <div class="flex w-full flex-col rounded-md bg-gray-100 p-2 text-xs text-secondary shadow-inner shadow-slate-400 dark:bg-gray-700 dark:text-primary dark:shadow-slate-500 sm:text-lg">
+                <div class="flex w-full flex-col rounded-md bg-gray-100 p-2 text-xs text-primary shadow-inner shadow-slate-400 dark:bg-gray-700 dark:text-secondary dark:shadow-slate-500 sm:text-lg">
                     <p>
                         @if (\Carbon\Carbon::parse($package->start_valid)->format('Y-m-d') != \Carbon\Carbon::parse($package->end_valid)->format('Y-m-d'))
                             {{ \Carbon\Carbon::parse($package->start_valid)->format('l, d F Y') }} -
@@ -121,7 +120,7 @@ new class extends Component {
         <div class="flex flex-col gap-2 sm:flex-row">
             <div class="inline-flex w-full basis-5/6 items-center justify-between rounded-md bg-gray-100 p-2 shadow-inner shadow-slate-400 dark:bg-gray-700 dark:shadow-slate-500">
                 <p class="text-gray-900 dark:text-white sm:text-lg">Event Package</p>
-                <p class="font-bold text-secondary dark:text-primary sm:text-lg">
+                <p class="font-bold text-primary dark:text-secondary sm:text-lg">
                     {{ 'Rp ' . number_format($totalPrice, 0, ',', '.') }}
                 </p>
             </div>
@@ -132,14 +131,6 @@ new class extends Component {
             </div>
         </div>
         <div class="mt-4 border-b-2 border-dashed border-gray-900 dark:border-white"></div>
-    </div>
-    <div class="mt-4 rounded-md bg-gray-50 p-4 shadow-lg dark:bg-gray-800""> <!-- Discount -->
-        <h3 class="mb-2 font-semibold text-gray-900 dark:text-white sm:text-lg">Promo</h3>
-        <div class="flex items-center gap-2 border-b-2 border-dashed border-gray-900 pb-4 dark:border-gray-50">
-            <input class="w-full rounded-md border-none bg-gray-100 p-2 text-gray-900 shadow-inner shadow-slate-400 focus:ring-0 dark:bg-gray-700 dark:text-white dark:shadow-slate-500" type="text"
-                placeholder="Enter promo code">
-            <button class="rounded-lg bg-gray-50 px-4 py-2 text-gray-900 shadow-lg hover:bg-gray-200 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500">Apply</button>
-        </div>
     </div>
     @if (session()->has('error'))
         <div class="mt-4 rounded-md bg-red-600 p-4 text-white dark:bg-red-500" x-data="{ show: true }" x-show="show" x-init="setTimeout(() => { show = false }, 3000)" x-transition:leave="transition ease-in duration-500"
@@ -152,7 +143,7 @@ new class extends Component {
         <h2 class="mb-4 font-bold text-gray-900 dark:text-white sm:text-lg">Summary</h2>
         <div class="inline-flex w-full flex-col justify-between sm:flex-row">
             <h3 class="mb-2 font-semibold text-gray-900 dark:text-white sm:text-lg">Date</h3>
-            <p class="mb-2 font-bold text-secondary dark:text-primary">
+            <p class="mb-2 font-bold text-primary dark:text-secondary">
                 {{ \Carbon\Carbon::parse($package->start_valid)->format('l, d F Y') }}
             </p>
         </div>
@@ -161,7 +152,7 @@ new class extends Component {
             <div class="flex w-full flex-col rounded-md">
                 <p class="mb-2 text-gray-900 dark:text-white">Total (<span>{{ $quantity }}</span> Ticket)</p>
                 <div x-data="{ open: false }">
-                    <p class="mb-2 inline-flex items-center font-bold text-secondary dark:text-primary" x-on:click="open = !open">
+                    <p class="vtext-primary mb-2 inline-flex items-center font-bold dark:text-secondary" x-on:click="open = !open">
                         {{ 'Rp ' . number_format($totalPrice, 0, ',', '.') }}
                         <x-heroicon-s-chevron-down class="ms-2 h-4 w-4" />
                     </p>
@@ -186,22 +177,13 @@ new class extends Component {
                                             {{ $quantity }}
                                         </td>
                                         <td class="border border-gray-900 px-4 py-2 text-xs dark:border-gray-50">
-                                            {{ $package->event->title . ' - ' . $package->title . ' - ' . \Carbon\Carbon::parse($package->start_valid)->format('l, d F Y') }}
+                                            {{ $package->event->title . ' - ' . $package->title }}
                                         </td>
                                         <td class="border border-gray-900 px-4 py-2 text-xs dark:border-gray-50">
                                             {{ 'Rp ' . number_format($package->price, 0, ',', '.') }}
                                         </td>
                                         <td class="border border-gray-900 px-4 py-2 text-xs dark:border-gray-50">
                                             {{ 'Rp ' . number_format($package->price * $quantity, 0, ',', '.') }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="border border-gray-900 px-2 py-2 text-xs dark:border-gray-50"></td>
-                                        <td class="border border-gray-900 px-4 py-2 text-xs dark:border-gray-50">Promo
-                                        </td>
-                                        <td class="border border-gray-900 px-4 py-2 text-xs dark:border-gray-50">Rp 0
-                                        </td>
-                                        <td class="border border-gray-900 px-4 py-2 text-xs dark:border-gray-50">Rp 0
                                         </td>
                                     </tr>
                                     <tr>
@@ -223,16 +205,14 @@ new class extends Component {
             </div>
         </div>
     </div>
-    <button class="mt-4 w-full rounded-md bg-secondary px-4 py-2 font-bold text-white hover:bg-secondary/80 dark:bg-primary dark:text-gray-900 dark:hover:bg-primary/80"
+    <button class="mt-4 w-full rounded-md bg-primary px-4 py-2 font-bold text-white hover:bg-primary/80 dark:bg-secondary dark:text-gray-900 dark:hover:bg-secondary/80"
         wire:click="bookTicket">Next</button>
 </div>
 
 @script
     <script>
-        $wire.on('redirect', () => {
-            setTimeout(function() {
-                window.location.href = '/tickets';
-            }, 2000);
+        $wire.on('redirect', (e) => {
+            window.location.href = '/book/' + e[0] + '/' + e[1] + '/' + e[2];
         });
     </script>
 @endscript

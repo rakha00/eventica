@@ -31,16 +31,8 @@ new class extends Component implements HasForms, HasActions {
 
     public function deleteTransaction()
     {
-        \Midtrans\Config::$isProduction = config('midtrans.isProduction');
-        \Midtrans\Config::$serverKey = config('midtrans.server_key');
-        $status = \Midtrans\Transaction::status($this->orderId);
-
-        if ($status->transaction_status == 'pending') {
-            $transaction = Transaction::where('order_id', $this->orderId)->first();
-            $transaction->eventPackage->increment('remaining', $transaction->quantity);
-            $transaction->update(['status' => 'Cancelled']);
-        }
-
+        $transaction = Transaction::where('order_id', $this->orderId)->first();
+        $transaction->eventPackage->increment('remaining', $transaction->quantity);
         $transaction->delete();
         return redirect()->route('home');
     }

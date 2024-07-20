@@ -134,7 +134,7 @@ new class extends Component {
         <div class="my-4 rounded-md bg-gray-50 p-4 shadow-lg dark:bg-gray-800" wire:ignore>
             <div class="inline-flex w-full flex-col items-center justify-between gap-2 sm:flex-row sm:gap-0">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Complete Payment In</h3>
-                <p class="shadow-slate-4000 w-fit rounded-md bg-gray-100 px-2 py-1 text-center text-secondary shadow-inner dark:bg-gray-700 dark:text-primary dark:shadow-slate-500" id="countdown">
+                <p class="shadow-slate-4000 w-fit rounded-md bg-gray-100 px-2 py-1 text-center text-primary shadow-inner dark:bg-gray-700 dark:text-secondary dark:shadow-slate-500" id="countdown">
                 </p>
             </div>
         </div>
@@ -151,20 +151,20 @@ new class extends Component {
         <p class="w-fit rounded-full bg-green-500 px-4 py-1 text-xs text-white">Recommended</p>
 
         <div class="mb-4 flex items-center">
-            <input class="h-4 w-4 bg-gray-100 text-secondary focus:ring-0 dark:bg-gray-700 dark:text-primary" id="gopay" name="payment_type" type="radio" value="gopay" wire:model="paymentType">
+            <input class="h-4 w-4 bg-gray-100 text-primary focus:ring-0 dark:bg-gray-700 dark:text-secondary" id="gopay" name="payment_type" type="radio" value="gopay" wire:model="paymentType">
             <label class="ms-2 font-medium text-gray-900 dark:text-gray-50" for="gopay">Gopay</label>
         </div>
         <div class="flex items-center">
-            <input class="h-4 w-4 bg-gray-100 text-secondary focus:ring-0 dark:bg-gray-700 dark:text-primary" id="bca" name="payment_type" type="radio" value="bca_va" wire:model="paymentType">
+            <input class="h-4 w-4 bg-gray-100 text-primary focus:ring-0 dark:bg-gray-700 dark:text-secondary" id="bca" name="payment_type" type="radio" value="bca_va" wire:model="paymentType">
             <label class="ms-2 font-medium text-gray-900 dark:text-gray-50" for="bca">BCA</label>
         </div>
         <div class="flex items-center">
-            <input class="h-4 w-4 bg-gray-100 text-secondary focus:ring-0 dark:bg-gray-700 dark:text-primary" id="alfamart" name="payment_type" type="radio" value="alfamart"
+            <input class="h-4 w-4 bg-gray-100 text-primary focus:ring-0 dark:bg-gray-700 dark:text-secondary" id="alfamart" name="payment_type" type="radio" value="alfamart"
                 wire:model="paymentType">
             <label class="ms-2 font-medium text-gray-900 dark:text-gray-50" for="alfamart">Alfamart</label>
         </div>
         <div class="flex items-center">
-            <input class="h-4 w-4 bg-gray-100 text-secondary focus:ring-0 dark:bg-gray-700 dark:text-primary" id="other_payment" name="payment_type" type="radio" value="other_payment"
+            <input class="h-4 w-4 bg-gray-100 text-primary focus:ring-0 dark:bg-gray-700 dark:text-secondary" id="other_payment" name="payment_type" type="radio" value="other_payment"
                 wire:model="paymentType">
             <label class="ms-2 font-medium text-gray-900 dark:text-gray-50" for="other_payment">Other Payment</label>
         </div>
@@ -177,7 +177,7 @@ new class extends Component {
         </p>
         <div class="flex items-center justify-between border-b-2 border-dashed pb-4" x-on:click="open = !open">
             <div class="flex items-center gap-4">
-                <div class="rounded-full bg-secondary p-2 dark:bg-primary">
+                <div class="rounded-full bg-primary p-2 dark:bg-secondary">
                     <x-heroicon-c-ticket class="size-6 text-white" />
                 </div>
                 <div class="flex flex-col">
@@ -239,16 +239,16 @@ new class extends Component {
         </div>
         <div class="my-2 inline-flex w-full items-center justify-between">
             <p class="text-gray-900 dark:text-gray-50">Total Payment</p>
-            <p class="font-bold text-secondary dark:text-primary">
+            <p class="font-bold text-primary dark:text-secondary">
                 {{ 'Rp ' . number_format($this->transaction->total_price, 0, ',', '.') }}
             </p>
         </div>
         <p class="text-xs text-gray-500 dark:text-gray-300">
             by proceeding with the payment process, you agree to the <span class="font-bold">Terms & Conditions</span>
-            and <span class="font-bold">Privacy Policy</span> of eventica.com
+            and <span class="font-bold">Privacy Policy</span> of himticket.com
         </p>
     </div>
-    <button class="mt-4 w-full rounded-md bg-secondary px-4 py-2 font-bold text-white hover:bg-secondary/80 dark:bg-primary dark:text-gray-900 dark:hover:bg-primary/80" wire:click="payment">
+    <button class="mt-4 w-full rounded-md bg-primary px-4 py-2 font-bold text-white hover:bg-primary/80 dark:bg-secondary dark:text-gray-900 dark:hover:bg-secondary/80" wire:click="payment">
         Pay Now
     </button>
 </div>

@@ -77,15 +77,15 @@ $logout = function (Logout $logout) {
             <ul
                 class="mt-4 flex flex-col rounded-lg border-2 border-primary bg-gray-50 p-4 font-medium rtl:space-x-reverse dark:border-secondary dark:bg-gray-800 md:mt-0 md:flex-row md:space-x-8 md:border-0 md:bg-white md:p-0 md:dark:bg-gray-800">
                 <li>
-                    <a class="block rounded bg-primary px-3 py-2 text-white shadow-sm dark:bg-secondary md:bg-transparent md:p-0 md:text-secondary md:dark:bg-gray-800 md:dark:text-secondary"
+                    <a class="block rounded bg-primary px-3 py-2 text-white shadow-sm dark:bg-secondary md:bg-transparent md:p-0 md:text-primary md:dark:bg-gray-800 md:dark:text-secondary"
                         href="{{ route('home') }}" aria-current="page" wire:navigate>Home</a>
                 </li>
                 <li>
-                    <a class="block rounded px-3 py-2 text-gray-900 hover:bg-gray-100 dark:border-gray-700 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:p-0 md:hover:bg-transparent md:hover:text-secondary md:dark:hover:bg-transparent md:dark:hover:text-secondary"
+                    <a class="block rounded px-3 py-2 text-gray-900 hover:bg-gray-100 dark:border-gray-700 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:p-0 md:hover:bg-transparent md:hover:text-primary md:dark:hover:bg-transparent md:dark:hover:text-secondary"
                         href="#">All Events</a>
                 </li>
                 <li>
-                    <a class="block rounded px-3 py-2 text-gray-900 hover:bg-gray-100 dark:border-gray-700 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:p-0 md:hover:bg-transparent md:hover:text-secondary md:dark:hover:bg-transparent md:dark:hover:text-secondary"
+                    <a class="block rounded px-3 py-2 text-gray-900 hover:bg-gray-100 dark:border-gray-700 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:p-0 md:hover:bg-transparent md:hover:text-primary md:dark:hover:bg-transparent md:dark:hover:text-secondary"
                         href="#">About Us</a>
                 </li>
             </ul>

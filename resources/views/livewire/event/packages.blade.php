@@ -50,8 +50,8 @@ new class extends Component {
                 <p class="text-gray-600 dark:text-gray-200">{{ $package->description }}</p>
             </div>
             <div class="flex flex-col items-center justify-between gap-2 sm:flex-row">
-                <p class="w-full justify-start text-xl font-bold text-secondary dark:text-primary">{{ 'Rp ' . number_format($package->price, 0, ',', '.') }}</p>
-                <a class="inline-flex w-full items-center justify-center rounded-lg bg-secondary px-3 py-2 text-center font-medium text-white hover:bg-secondary/80 dark:bg-primary dark:text-gray-900 sm:max-w-fit"
+                <p class="w-full justify-start text-xl font-bold text-primary dark:text-secondary">{{ 'Rp ' . number_format($package->price, 0, ',', '.') }}</p>
+                <a class="inline-flex w-full items-center justify-center rounded-lg bg-primary px-3 py-2 text-center font-medium text-white dark:bg-secondary dark:text-gray-900 dark:hover:bg-secondary/80 sm:max-w-fit"
                     href="{{ route('transaction-detail', [$event->slug, $package->slug]) }}">
                     Select Package
                 </a>

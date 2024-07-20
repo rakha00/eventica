@@ -15,7 +15,7 @@
         <li aria-current="page">
             <div class="flex items-center">
                 <x-heroicon-o-chevron-right class="size-4 me-2.5 text-gray-800 dark:text-gray-200" />
-                <span class="ms-1 text-sm font-bold text-secondary dark:text-primary md:ms-2">Detail Event</span>
+                <span class="ms-1 text-sm font-bold text-primary dark:text-secondary md:ms-2">Detail Event</span>
             </div>
         </li>
     </ol>

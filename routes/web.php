@@ -3,7 +3,6 @@
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
-
 Volt::route('/', 'pages.app.index')->name('home');
 Volt::route('/event/{eventSlug}', 'pages.app.event-detail')->name('event-detail');
 

@@ -22,8 +22,8 @@ export default {
                 sans: ["Poppins", ...defaultTheme.fontFamily.sans],
             },
             colors: {
-                primary: "#00FFB2",
-                secondary: "#4C7BE9",
+                primary: "#20327C",
+                secondary: "#A3BFFF",
                 tertiary: "#1D0869",
             },
         },

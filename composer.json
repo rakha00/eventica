@@ -10,6 +10,7 @@
         "chillerlan/php-qrcode": "^5.0",
         "codeat3/blade-codicons": "^1.33",
         "codeat3/blade-google-material-design-icons": "^1.19",
+        "davidhsianturi/blade-bootstrap-icons": "^1.5",
         "filament/filament": "^3.2",
         "filament/notifications": "^3.2",
         "laravel/framework": "^11.9",

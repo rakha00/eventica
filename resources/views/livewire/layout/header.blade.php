@@ -9,7 +9,7 @@ $logout = function (Logout $logout) {
 };
 ?>
 
-<header class="relative z-10 border-b-2 border-gray-200 border-b-secondary bg-white shadow-lg dark:border-b-primary dark:bg-gray-950 dark:shadow-gray-700">
+<header class="relative z-10 border-b-2 border-gray-200 border-b-primary bg-white dark:border-b-secondary dark:bg-gray-800">
     <div class="mx-auto flex max-w-screen-xl flex-wrap items-center justify-between p-4">
         <a class="flex items-center space-x-3 rtl:space-x-reverse" href="{{ route('home') }}" wire:navigate>
             <img class="h-10 md:h-14" src="{{ asset('img/logo.webp') }}" alt="Logo" />
@@ -75,17 +75,17 @@ $logout = function (Logout $logout) {
         </div>
         <div class="hidden w-full items-center justify-between md:order-1 md:flex md:w-auto" id="navbar-user">
             <ul
-                class="mt-4 flex flex-col rounded-lg border border-gray-100 bg-gray-50 p-4 font-medium rtl:space-x-reverse dark:border-gray-700 dark:bg-gray-800 md:mt-0 md:flex-row md:space-x-8 md:border-0 md:bg-white md:p-0 md:dark:bg-gray-950">
+                class="mt-4 flex flex-col rounded-lg border-2 border-primary bg-gray-50 p-4 font-medium rtl:space-x-reverse dark:border-secondary dark:bg-gray-800 md:mt-0 md:flex-row md:space-x-8 md:border-0 md:bg-white md:p-0 md:dark:bg-gray-800">
                 <li>
-                    <a class="block rounded bg-secondary px-3 py-2 text-white dark:bg-primary dark:text-gray-900 md:bg-transparent md:p-0 md:text-secondary md:dark:bg-gray-950 md:dark:text-primary"
+                    <a class="block rounded bg-primary px-3 py-2 text-white shadow-sm dark:bg-secondary md:bg-transparent md:p-0 md:text-secondary md:dark:bg-gray-800 md:dark:text-secondary"
                         href="{{ route('home') }}" aria-current="page" wire:navigate>Home</a>
                 </li>
                 <li>
-                    <a class="block rounded px-3 py-2 text-gray-900 hover:bg-gray-100 dark:border-gray-700 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:p-0 md:hover:bg-transparent md:hover:text-secondary md:dark:hover:bg-transparent md:dark:hover:text-primary"
+                    <a class="block rounded px-3 py-2 text-gray-900 hover:bg-gray-100 dark:border-gray-700 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:p-0 md:hover:bg-transparent md:hover:text-secondary md:dark:hover:bg-transparent md:dark:hover:text-secondary"
                         href="#">All Events</a>
                 </li>
                 <li>
-                    <a class="block rounded px-3 py-2 text-gray-900 hover:bg-gray-100 dark:border-gray-700 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:p-0 md:hover:bg-transparent md:hover:text-secondary md:dark:hover:bg-transparent md:dark:hover:text-primary"
+                    <a class="block rounded px-3 py-2 text-gray-900 hover:bg-gray-100 dark:border-gray-700 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:p-0 md:hover:bg-transparent md:hover:text-secondary md:dark:hover:bg-transparent md:dark:hover:text-secondary"
                         href="#">About Us</a>
                 </li>
             </ul>

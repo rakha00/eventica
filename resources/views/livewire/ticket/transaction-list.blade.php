@@ -21,12 +21,12 @@ new class extends Component {
     public function payment($transaction)
     {
         if ($transaction['status'] == 'Pending') {
-            Notification::make()->title('Whoops! it seems the snap token has not been created')->warning()->body('Please complete your transaction here.')->send();
+            Notification::make()->title("Whoops! it seems your transaction hasn't been completed yet")->warning()->body('Please complete your transaction here.')->send();
             return $this->redirect(route('transaction-contact', ['eventSlug' => $transaction['event_package']['event']['slug'], 'packageSlug' => $transaction['event_package']['slug'], 'orderId' => $transaction['order_id']]));
         }
         if ($transaction['status'] == 'On payment') {
             if ($transaction['snap_token'] == null) {
-                Notification::make()->title('Whoops! it seems the snap token has not been created')->warning()->body('Please complete your transaction here.')->send();
+                Notification::make()->title("Whoops! it seems the snap token hasn't been created yet")->warning()->body('Please complete your transaction here.')->send();
                 return $this->redirect(route('transaction-payment', ['orderId' => $transaction['order_id']]));
             } else {
                 $this->dispatch('snapJs', $transaction['snap_token']);
@@ -51,7 +51,7 @@ new class extends Component {
                                     ({{ $transaction->eventPackage->title }})
                                 </h5>
                                 <p
-                                    class="{{ $transaction->status == 'Expired'
+                                    class="{{ $transaction->status == 'Expired' || $transaction->status == 'Canceled'
                                         ? 'bg-red-500'
                                         : ($transaction->status == 'Pending' || $transaction->status == 'On payment'
                                             ? 'bg-yellow-300'
@@ -65,7 +65,7 @@ new class extends Component {
                                 <div>
                                     <p class="text-sm text-gray-700 dark:text-gray-400">{{ 'Order ID: ' . $transaction->order_id }}</p>
                                     <p class="text-sm text-gray-700 dark:text-gray-400">{{ \Carbon\Carbon::parse($transaction->created_at)->format('d F Y H:i') }}</p>
-                                    <p class="font-bold text-secondary dark:text-primary">{{ 'Rp ' . number_format($transaction->total_price, 0, ',', '.') }}</p>
+                                    <p class="font-bold text-primary dark:text-secondary">{{ 'Rp ' . number_format($transaction->total_price, 0, ',', '.') }}</p>
                                 </div>
                                 <div class="flex items-end">
                                     @if ($transaction->status == 'Pending' || $transaction->status == 'On payment')
@@ -97,15 +97,6 @@ new class extends Component {
                     /* You may add your own js here, this is just example */
                     $wire.$call('onSuccess');
                 },
-                // Optional
-                onError: function(result) {
-                    /* You may add your own js here, this is just example */
-                    alert("payment failed!");
-                    console.log(result);
-                },
-                onClose: function() {
-
-                }
             });
         });
     </script>

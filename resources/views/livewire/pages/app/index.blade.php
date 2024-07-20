@@ -33,8 +33,8 @@ layout('layouts.app');
             </section>
 
             <section class="mx-auto mt-4 max-w-7xl">
-                <h2 class="mb-4 text-2xl font-bold text-gray-900 dark:text-white md:text-4xl">Popular Events</h2>
-                <livewire:home.popular-events />
+                <h2 class="mb-4 text-2xl font-bold text-gray-900 dark:text-white md:text-4xl">Upcoming Events</h2>
+                <livewire:home.upcoming-events />
             </section>
 
             {{--

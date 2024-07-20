@@ -14,14 +14,7 @@ new class extends Component {
 
     public function mount()
     {
-        $this->transaction = Transaction::where('order_id', request()->route('orderId'))
-            ->where('user_id', auth()->user()->id)
-            ->first();
-
-        // Handle redirect failed
-        if ($this->transaction->status === 'On payment') {
-            $this->dispatch('redirect', $this->transaction->order_id);
-        }
+        $this->transaction = Transaction::where('order_id', request()->route('orderId'))->where('user_id', auth()->id())->where('status', 'Pending')->firstOrFail();
 
         $tickets = Ticket::where('transaction_id', $this->transaction->id)->get();
         foreach ($tickets as $index => $ticket) {
@@ -77,11 +70,6 @@ new class extends Component {
         }
     }
 
-    public function updateTransaction()
-    {
-        $this->transaction->update(['status' => 'On payment']);
-    }
-
     public function fillAllInformation()
     {
         $this->isFilled = !$this->isFilled;
@@ -98,19 +86,10 @@ new class extends Component {
         $this->validate();
         $this->updateUser();
         $this->updateTicket();
-        $this->updateTransaction();
         return redirect()->route('transaction-payment', ['orderId' => $this->transaction->order_id]);
     }
 };
 ?>
-
-@script
-    <script>
-        $wire.on('redirect', (orderId) => {
-            window.location.href = '/payment/' + orderId;
-        });
-    </script>
-@endscript
 
 <div class="p-6">
     <h2 class="mb-2 text-2xl font-semibold text-gray-900 dark:text-white">Visitor Details</h2>
@@ -194,6 +173,14 @@ new class extends Component {
         </button>
     </form>
 </div>
+
+@script
+    <script>
+        $wire.on('redirect', (orderId) => {
+            window.location.href = '/payment/' + orderId;
+        });
+    </script>
+@endscript
 
 @script
     <script>

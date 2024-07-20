@@ -14,7 +14,7 @@ layout('layouts.app');
                     <div class="sm:hidden">
                         <label class="sr-only" for="tabs">Select Tabs</label>
                         <select
-                            class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-secondary focus:ring-secondary dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-primary dark:focus:ring-primary"
+                            class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary focus:ring-primary dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-secondary dark:focus:ring-secondary"
                             id="tabs" x-model="tab">
                             <option value="tickets">Tickets</option>
                             <option value="transactions">Transactions</option>

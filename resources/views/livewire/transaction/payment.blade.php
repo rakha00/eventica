@@ -3,6 +3,7 @@
 use App\Models\Transaction;
 use Filament\Notifications\Notification;
 use Livewire\Volt\Component;
+use App\Models\Ticket;
 
 new class extends Component {
     public $transaction;
@@ -11,7 +12,19 @@ new class extends Component {
 
     public function mount()
     {
-        $this->transaction = Transaction::where('order_id', request()->route('orderId'))->where('status', 'On payment')->firstOrFail();
+        $this->transaction = Transaction::where([
+            'order_id' => request()->route('orderId'),
+            'user_id' => auth()->id(),
+            'status' => 'Pending',
+        ])->firstOrFail();
+
+        $incompleteTicketExists = Ticket::where('transaction_id', $this->transaction->id)
+            ->whereNull(['name', 'email', 'phone', 'identity_card_number'])
+            ->exists();
+
+        if ($incompleteTicketExists) {
+            abort(404);
+        }
     }
 
     public function createMidtransTransaction()
@@ -20,6 +33,7 @@ new class extends Component {
         \Midtrans\Config::$isProduction = config('midtrans.isProduction');
         \Midtrans\Config::$isSanitized = config('midtrans.isSanitized');
         \Midtrans\Config::$is3ds = config('midtrans.is3ds');
+        \Midtrans\Config::$overrideNotifUrl = env('APP_URL') . '/api/midtrans/notification';
 
         $transaction_details = [
             'order_id' => $this->transaction->order_id,
@@ -263,7 +277,6 @@ new class extends Component {
             snap.pay(event.detail[0], {
                 // Optional
                 onSuccess: function(result) {
-                    /* You may add your own js here, this is just example */
                     $wire.$call('onSuccess');
                 },
                 // Optional
@@ -276,9 +289,6 @@ new class extends Component {
                     alert("payment failed!");
                     console.log(result);
                 },
-                onClose: function() {
-
-                }
             });
         });
     </script>

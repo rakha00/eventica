@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Ticket;
 use App\Models\Transaction;
-use Illuminate\Http\Request;
 
 class TransactionController extends Controller
 {
@@ -22,17 +21,19 @@ class TransactionController extends Controller
             if ($transactionStatus === 'settlement') {
                 $tickets = Ticket::where('transaction_id', $transaction->id)->get();
                 foreach ($tickets as $ticket) {
-                    $ticket->status = "Active";
-                    $ticket->save();
+                    $ticket->update(['status' => "Active"]);
                 }
-                $transaction->status = "Completed";
-                $transaction->save();
+                $transaction->update(['status' => 'Completed']);
             } elseif ($transactionStatus === 'pending') {
-                // TODO Set payment status in merchant's database to 'pending'
+                $transaction->update(['status' => 'On payment']);
             } elseif ($transactionStatus === 'cancel') {
-                // TODO Set payment status in merchant's database to 'canceled'
+                Ticket::where('transaction_id', $transaction->id)->delete();
+                $transaction->eventPackage->increment('remaining', $transaction->quantity);
+                $transaction->update(['status' => "Canceled"]);
             } elseif ($transactionStatus === 'expire') {
-                // TODO Set payment status in merchant's database to 'expire'
+                Ticket::where('transaction_id', $transaction->id)->delete();
+                $transaction->eventPackage->increment('remaining', $transaction->quantity);
+                $transaction->update(['status' => "Expired"]);
             }
         }
     }

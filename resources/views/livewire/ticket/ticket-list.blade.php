@@ -77,19 +77,19 @@ new class extends Component {
 }; ?>
 
 <div>
-    <div class="flex space-x-4" x-data="{ activeTab: 'allTickets' }">
+    <div class="md: flex flex-col space-y-2 sm:flex-row sm:space-x-4 sm:space-y-0" x-data="{ activeTab: 'allTickets' }">
         <button class="rounded-full bg-white px-2 py-1 text-xs shadow dark:bg-gray-700"
-            :class="{ 'bg-secondary text-white dark:bg-primary dark:text-gray-900': activeTab === 'allTickets', 'bg-white text-gray-900 dark:text-white': activeTab !== 'allTickets' }"
+            :class="{ 'dark:bg-secondary text-white bg-primary dark:text-gray-900': activeTab === 'allTickets', 'bg-white text-gray-900 dark:text-white': activeTab !== 'allTickets' }"
             x-on:click="activeTab = 'allTickets'" wire:click="allTickets">
             All Tickets
         </button>
         <button class="rounded-full bg-white px-2 py-1 text-xs shadow dark:bg-gray-700 dark:text-white"
-            :class="{ 'bg-secondary text-white dark:bg-primary dark:text-gray-900': activeTab === 'upcomingEvents', 'bg-white text-gray-9000 dark:text-white': activeTab !== 'upcomingEvents' }"
+            :class="{ 'dark:bg-secondary text-white bg-primary dark:text-gray-900': activeTab === 'upcomingEvents', 'bg-white text-gray-900 dark:text-white': activeTab !== 'upcomingEvents' }"
             x-on:click="activeTab = 'upcomingEvents'" wire:click="upcomingEvents">
             Upcoming Events
         </button>
         <button class="rounded-full bg-white px-2 py-1 text-xs shadow dark:bg-gray-700 dark:text-white"
-            :class="{ 'bg-secondary text-white dark:bg-primary dark:text-gray-900': activeTab === 'pastEvents', 'bg-white text-gray-9000 dark:text-white': activeTab !== 'pastEvents' }"
+            :class="{ 'dark:bg-secondary text-white bg-primary dark:text-gray-900': activeTab === 'pastEvents', 'bg-white text-gray-900 dark:text-white': activeTab !== 'pastEvents' }"
             x-on:click="activeTab = 'pastEvents'" wire:click="pastEvents">
             Past Events
         </button>
@@ -101,7 +101,7 @@ new class extends Component {
         </x-slot>
         {{-- Modal content --}}
         <img class="w-full" src="{{ $qrCode }}" alt="QR Code">
-        <p>{{ 'Ticket ID: ' . $ticketId }}</p>
+        <p class="text-gray-900 dark:text-white">{{ 'Ticket ID: ' . $ticketId }}</p>
     </x-filament::modal>
 
     <div x-data="{ open: null }">

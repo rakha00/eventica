@@ -16,13 +16,18 @@ new class extends Component {
     {
         $this->package = EventPackage::where('slug', request()->route('packageSlug'))->firstOrFail();
 
-        // Handle redirect failed
-        $existingTransaction = Transaction::where('user_id', auth()->user()->id)
-            ->where('event_package_id', $this->package->id)
-            ->first();
+        $userId = auth()->id();
+        $eventId = $this->package->event->id;
+        $packageId = $this->package->id;
 
-        if ($existingTransaction) {
-            $this->dispatch('redirect', $this->package->event->slug, $this->package->slug, $existingTransaction->order_id);
+        // Handle if user has this package transaction
+        if ($transaction = Transaction::where('user_id', $userId)->where('event_package_id', $packageId)->first()) {
+            $this->dispatch('redirect', $this->package->event->slug, $this->package->slug, $transaction->order_id);
+        }
+
+        // Handle if user already booked event package
+        if (Transaction::where('user_id', $userId)->whereHas('eventPackage', fn($query) => $query->where('event_id', $eventId))->exists()) {
+            abort(404);
         }
 
         $this->totalPrice = $this->package->price;

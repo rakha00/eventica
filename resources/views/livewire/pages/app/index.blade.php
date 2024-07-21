@@ -23,7 +23,7 @@ layout('layouts.app');
             <section class="mx-auto mt-4 max-w-7xl">
                 <h1 class="text-2xl font-bold text-gray-900 dark:text-white md:text-6xl">HIMTicket</h1>
                 <p class="font-mono italic text-gray-900 dark:text-white sm:text-xl">Find your joy here</p>
-                <x-button class="mt-4">
+                <x-button class="mt-4" href="{{ route('search') }}" wire:navigate>
                     All Events
                 </x-button>
             </section>

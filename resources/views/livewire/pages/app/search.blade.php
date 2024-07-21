@@ -13,17 +13,7 @@ layout('layouts.app');
     <livewire:layout.header />
 
     <main>
-        <div class="px-4">
-            <section class="mt-6">
-                <livewire:search.search-bar />
-            </section>
-        </div>
-
-        <div class="px-4">
-            <section class="mx-auto mt-4 max-w-7xl">
-                <livewire:search.search-events />
-            </section>
-        </div>
+        <livewire:search.search-events />
     </main>
 
     <livewire:layout.footer />

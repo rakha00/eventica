@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
 Volt::route('/', 'pages.app.index')->name('home');
+Volt::route('/search', 'pages.app.search')->name('search');
+Volt::route('/about', 'pages.app.about')->name('about');
 Volt::route('/event/{eventSlug}', 'pages.app.event-detail')->name('event-detail');
 
 Route::middleware(['auth'])->group(function () {

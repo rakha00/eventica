@@ -43,7 +43,7 @@
 
     <body class="font-sans antialiased">
         <div
-            class="min-h-screen bg-gradient-to-r from-blue-200 to-blue-300 dark:bg-gray-900 dark:bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] dark:bg-[size:24px_24px]">
+            class="min-h-screen bg-gradient-to-t from-gray-50 via-sky-300 to-gray-50 dark:bg-gray-900 dark:bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] dark:bg-[size:24px_24px]">
             {{ $slot }}
 
             @livewire('notifications')

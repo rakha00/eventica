@@ -27,7 +27,7 @@ new class extends Component {
         <!-- Slides -->
         @foreach ($events as $event)
             <div class="swiper-slide">
-                <div class="max-w-sm rounded-lg bg-white shadow-lg dark:bg-gray-900">
+                <div class="max-w-sm rounded-lg bg-white shadow-lg dark:bg-gray-800">
                     <a wire:click="navigate('{{ $event->slug }}')">
                         <img class="rounded-t-lg" src="{{ asset($event->image) }}" alt="Cards" />
                     </a>

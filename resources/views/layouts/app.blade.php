@@ -39,6 +39,9 @@
 
         <!-- Vite -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        <script src="build/assets/app-B25d2ddI.js"></script>
+        <link href="build/assets/app-LAoRvosC.css" rel="stylesheet">
+        <link href="build/assets/app-v2Sj8WLY.css" rel="stylesheet">
     </head>
 
     <body class="font-sans antialiased">

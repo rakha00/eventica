@@ -36,15 +36,6 @@ layout('layouts.app');
                 <h2 class="mb-4 text-2xl font-bold text-gray-900 dark:text-white md:text-4xl">Upcoming Events</h2>
                 <livewire:home.upcoming-events />
             </section>
-
-            {{--
-            <section class="mx-auto mb-6 mt-4 max-w-7xl">
-                <div class="flex items-center justify-between">
-                    <h2 class="mb-4 text-2xl font-bold text-gray-900 dark:text-white md:text-4xl">Blogs</h2>
-                    <p class="text-xl text-gray-900 dark:text-white dark:hover:text-gray-200">See More</p>
-                </div>
-                <livewire:home.blogs />
-            </section> --}}
         </div>
     </main>
 

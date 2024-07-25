@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('event_id')->constrained('events');
             $table->string('title');
-            $table->string('description');
+            $table->text('description');
             $table->unsignedBigInteger('price');
             $table->unsignedBigInteger('capacity');
             $table->unsignedBigInteger('remaining');

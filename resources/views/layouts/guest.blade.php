@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace("_", "-", app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config("app.name", "Laravel") }}</title>
+        <title>{{ config('app.name', 'Laravel') }}</title>
 
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com" rel="preconnect">
@@ -34,14 +34,17 @@
         </script>
 
         <!-- Scripts -->
-        @vite(["resources/css/app.css", "resources/js/app.js"])
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+        <script src="build/assets/app-B25d2ddI.js"></script>
+        <link href="build/assets/app-LAoRvosC.css" rel="stylesheet">
+        <link href="build/assets/app-v2Sj8WLY.css" rel="stylesheet">
     </head>
 
     <body class="font-sans text-gray-900 antialiased">
         <div class="flex min-h-screen flex-col items-center bg-gray-100 pt-6 dark:bg-gray-900 sm:justify-center sm:pt-0">
             <div>
                 <a href="/" wire:navigate>
-                    <img class="h-28 w-auto fill-current text-gray-800 dark:text-gray-200" src="{{ asset("img/logo.webp") }}" alt="Logo">
+                    <img class="h-28 w-auto fill-current text-gray-800 dark:text-gray-200" src="{{ asset('img/logo.webp') }}" alt="Logo">
                 </a>
             </div>
 

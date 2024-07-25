@@ -87,7 +87,7 @@ $logout = function (Logout $logout) {
                 </li>
                 <li>
                     <a class="block rounded px-3 py-2 hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-700 md:p-0 md:hover:bg-transparent md:hover:text-primary md:dark:hover:bg-transparent md:dark:hover:text-secondary"
-                        href="#" :class="activePage === 'about' ? ' text-primary dark:text-secondary' : 'text-gray-900 dark:text-white'" wire:navigate>About Us</a>
+                        href="{{ route('about') }}" :class="activePage === 'about' ? ' text-primary dark:text-secondary' : 'text-gray-900 dark:text-white'" wire:navigate>About Us</a>
                 </li>
             </ul>
         </div>

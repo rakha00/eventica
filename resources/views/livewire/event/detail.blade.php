@@ -9,6 +9,7 @@ new class extends Component {
     public function mount()
     {
         $this->event = Event::where('slug', request()->eventSlug)
+            ->where('status', 'published')
             ->with('eventPackages')
             ->first();
         $this->event->lowest_price = $this->event->eventPackages->min('price');

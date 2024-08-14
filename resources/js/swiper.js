@@ -1,3 +1,5 @@
+import Swiper from "swiper/bundle";
+
 function initializeSwiper() {
     new Swiper(".swiper", {
         // Optional parameters

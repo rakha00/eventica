@@ -10,6 +10,9 @@ new class extends Component {
     public function mount()
     {
         $this->transactions = Transaction::where('user_id', auth()->id())->orderBy('created_at', 'desc')->get();
+        \Midtrans\Config::$serverKey = config('midtrans.server_key');
+        $status = \Midtrans\Transaction::status('66AB931809640');
+        dd($status);
     }
 
     public function onSuccess()

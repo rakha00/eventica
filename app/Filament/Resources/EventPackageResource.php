@@ -18,6 +18,7 @@ use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Support\RawJs;
+use Illuminate\Validation\Rule;
 
 class EventPackageResource extends Resource
 {
@@ -34,7 +35,7 @@ class EventPackageResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Select::make('event_id')
-                    ->relationship('event', 'title')
+                    ->relationship('event', 'title', modifyQueryUsing: fn (Builder $query) => $query->orderBy('created_at', 'desc'))
                     ->required()
                     ->live(debounce: 500)
                     ->afterStateUpdated(function (Set $set, ?string $state) {
@@ -88,7 +89,7 @@ class EventPackageResource extends Resource
                 Forms\Components\TextInput::make('remaining')
                     ->readOnly(),
                 Forms\Components\TextInput::make('slug')
-                    ->readOnly(),
+                    ->readOnly()
             ]);
     }
 
@@ -156,7 +157,7 @@ class EventPackageResource extends Resource
             ->bulkActions([
                 //
             ])
-            ->defaultSort('created_at', 'desc');;
+            ->defaultSort('created_at', 'desc');
     }
 
     public static function getPages(): array

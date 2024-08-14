@@ -21,7 +21,7 @@ return new class extends Migration
             $table->unsignedBigInteger('remaining');
             $table->dateTime('start_valid');
             $table->dateTime('end_valid');
-            $table->string('slug')->unique();
+            $table->string('slug');
             $table->timestamps();
         });
     }

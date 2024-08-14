@@ -8,7 +8,7 @@ new class extends Component {
 
     public function mount()
     {
-        $this->events = Event::take(4)->get();
+        $this->events = Event::latest()->where('status', 'published')->take(4)->get();
     }
 }; ?>
 

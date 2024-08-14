@@ -68,6 +68,12 @@ new class extends Component {
                         disabled>
                         Booked
                     </button>
+                @elseif ($package->remaining === 0)
+                    <button
+                        class="inline-flex w-full items-center justify-center rounded-lg bg-red-500 px-3 py-2 text-center font-medium text-white dark:bg-secondary dark:text-gray-900 dark:hover:bg-secondary/80 sm:max-w-fit"
+                        disabled>
+                        Sold Out
+                    </button>
                 @else
                     <a class="inline-flex w-full items-center justify-center rounded-lg bg-primary px-3 py-2 text-center font-medium text-white dark:bg-secondary dark:text-gray-900 dark:hover:bg-secondary/80 sm:max-w-fit"
                         href="{{ route('transaction-detail', [$event->slug, $package->slug]) }}

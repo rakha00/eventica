@@ -18,7 +18,7 @@ new class extends Component {
 
 <div>
     <div class="flex justify-center">
-        <img class="aspect-video w-[1000px] rounded-lg" src="{{ asset($event->image) }}" alt="Event">
+        <img class="aspect-video w-full max-w-[1000px] rounded-lg" src="{{ asset('storage/' . $event->image) }}" alt="Event {{ $event->title }}">
     </div>
     <div class="mb-4 border-b border-primary dark:border-secondary">
         <!-- Nav Tabs -->

@@ -1,3 +1,11 @@
+@php
+    $cwd = getcwd();
+    $cssName = basename(glob($cwd . '/build/assets/*.css')[0], '.css');
+    $jsName = basename(glob($cwd . '/build/assets/*.js')[0], '.js');
+    $css = asset('build/assets/' . $cssName . '.css');
+    $js = asset('build/assets/' . $jsName . '.js');
+@endphp
+
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
@@ -38,10 +46,10 @@
         @stack('styles')
 
         <!-- Vite -->
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-        <script src="build/assets/app-B25d2ddI.js"></script>
-        <link href="build/assets/app-LAoRvosC.css" rel="stylesheet">
-        <link href="build/assets/app-v2Sj8WLY.css" rel="stylesheet">
+        {{-- @vite(['resources/css/app.css', 'resources/js/app.js']) --}}
+        <!-- Vite Build -->
+        <link id="css" href="{{ $css }}" rel="stylesheet">
+        <script src="{{ $js }}" id="js"></script>
     </head>
 
     <body class="font-sans antialiased">

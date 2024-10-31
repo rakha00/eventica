@@ -33,21 +33,20 @@ class EventResource extends Resource
 
         return $form
             ->schema([
-                Forms\Components\Select::make('event_category_id')
-                    ->relationship('eventCategory', 'title')
+                Forms\Components\TextInput::make('category')
                     ->required(),
                 Forms\Components\TextInput::make('title')
                     ->required()
                     ->maxLength(50)
                     ->live(debounce: 500)
-                    ->afterStateUpdated(fn (Set $set, $state) => $set('slug', Str::slug($state))),
+                    ->afterStateUpdated(fn(Set $set, $state) => $set('slug', Str::slug($state))),
                 Forms\Components\DateTimePicker::make('start_event')
                     ->required()
                     ->minDate(now())
                     ->live(debounce: 500),
                 Forms\Components\DateTimePicker::make('end_event')
                     ->required()
-                    ->minDate(fn (Get $get) => $get('start_event')),
+                    ->minDate(fn(Get $get) => $get('start_event')),
                 Forms\Components\TextInput::make('location')
                     ->required()
                     ->maxLength(50),
@@ -92,7 +91,7 @@ class EventResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('title')
-                    ->description(fn (Event $record): string => strip_tags(Str::limit($record->description, 20)))
+                    ->description(fn(Event $record): string => strip_tags(Str::limit($record->description, 20)))
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('start_event')
@@ -105,13 +104,13 @@ class EventResource extends Resource
                     ->limit(10),
                 Tables\Columns\TextColumn::make('capacity')
                     ->label('Capacity')
-                    ->getStateUsing(fn (Event $record): int => $record->eventPackages()->sum('capacity')),
+                    ->getStateUsing(fn(Event $record): int => $record->eventPackages()->sum('capacity')),
                 Tables\Columns\TextColumn::make('sold')
                     ->label('Sold')
-                    ->getStateUsing(fn (Event $record): int => $record->eventPackages()->sum('capacity') - $record->eventPackages()->sum('remaining')),
+                    ->getStateUsing(fn(Event $record): int => $record->eventPackages()->sum('capacity') - $record->eventPackages()->sum('remaining')),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'unpublished' => 'danger',
                         'published' => 'success',
                     }),
@@ -137,11 +136,11 @@ class EventResource extends Resource
                         return $query
                             ->when(
                                 $data['start_event'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('start_event', '>=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('start_event', '>=', $date),
                             )
                             ->when(
                                 $data['end_event'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('end_event', '<=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('end_event', '<=', $date),
                             );
                     })
                     ->indicateUsing(function (array $data): ?string {
@@ -165,10 +164,10 @@ class EventResource extends Resource
                         ->label('Event Packages')
                         ->color('info')
                         ->icon('heroicon-s-arrow-uturn-right')
-                        ->url(fn (Event $record): string => url('admin/event-packages?tableFilters[event_id][value]=' . $record->id)),
+                        ->url(fn(Event $record): string => url('admin/event-packages?tableFilters[event_id][value]=' . $record->id)),
                     Tables\Actions\Action::make('toggle_publish')
-                        ->label(fn (Event $record): string => $record->status === 'published' ? 'Unpublish' : 'Publish')
-                        ->color(fn (Event $record): string => $record->status === 'published' ? 'danger' : 'success')
+                        ->label(fn(Event $record): string => $record->status === 'published' ? 'Unpublish' : 'Publish')
+                        ->color(fn(Event $record): string => $record->status === 'published' ? 'danger' : 'success')
                         ->icon('heroicon-o-globe-alt')
                         ->action(function (Event $record) {
                             if ($record->eventPackages()->exists()) {
